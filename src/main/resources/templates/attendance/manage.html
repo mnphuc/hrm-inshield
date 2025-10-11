@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section th:fragment="content">
+    <div class="card">
+        <div class="table-actions">
+            <div>
+                <button type="button" class="button" data-open-modal="attendanceModal" data-mode="create">
+                    + Them cham cong
+                </button>
+            </div>
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a class="page-link"
+                   th:classappend="${currentPage == 0}? 'disabled'"
+                   th:href="${currentPage == 0}? '#': @{/cms/attendance(page=${currentPage - 1}, size=${pageSize})}">Prev</a>
+                <a class="page-link"
+                   th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:text="${pageNum + 1}"
+                   th:href="@{/cms/attendance(page=${pageNum}, size=${pageSize})}"
+                   th:classappend="${pageNum == currentPage}? 'active'">1</a>
+                <a class="page-link"
+                   th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
+                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/attendance(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Nhan vien</th>
+                    <th>Ngay</th>
+                    <th>Vao</th>
+                    <th>Ra</th>
+                    <th>So gio</th>
+                    <th>Ghi chu</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="record : ${records}">
+                    <td th:text="${#lists.find(employees, e -> e.id == record.employeeId)?.fullName}">Nhan vien</td>
+                    <td th:text="${record.workDate}">2024-01-01</td>
+                    <td th:text="${record.checkIn}">08:00</td>
+                    <td th:text="${record.checkOut}">17:00</td>
+                    <td th:text="${record.workedHours}">8</td>
+                    <td th:text="${record.notes}">Ghi chu</td>
+                    <td class="actions-cell">
+                        <button type="button" class="button-link" data-open-modal="attendanceModal" data-mode="edit"
+                                th:attr="data-record-id=${record.id},
+                                         data-value-employee-id=${record.employeeId},
+                                         data-value-work-date=${record.workDate},
+                                         data-value-check-in=${record.checkIn},
+                                         data-value-check-out=${record.checkOut},
+                                         data-value-worked-hours=${record.workedHours},
+                                         data-value-notes=${record.notes}">
+                            Chinh sua
+                        </button>
+                        <form th:action="@{/cms/attendance/{id}/delete(id=${record.id})}" method="post"
+                              th:attr="data-confirm-message=${'Ban co chac muon xoa cham cong ngay ' + record.workDate + '?'}">
+                            <button type="submit" class="link danger">Xoa</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${records.isEmpty()}">
+                    <td colspan="7" class="empty">Chua co du lieu cham cong</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-summary" th:if="${totalElements > 0}">
+            <span th:text="${'Dang hien thi ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' ban ghi'}">Summary</span>
+        </div>
+    </div>
+
+    <div class="modal-backdrop"
+         id="attendanceModal"
+         data-modal
+         th:data-open="${showModal} ? 'true' : 'false'"
+         th:data-mode="${modalMode}"
+         th:data-record-id="${editId}"
+         th:data-create-url="@{/cms/attendance}"
+         th:data-update-template="@{/cms/attendance/__ID__/update}"
+         data-create-title="Them cham cong"
+         data-edit-title="Cap nhat cham cong"
+         data-create-text="Luu"
+         data-edit-text="Cap nhat">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-modal-title>Quan ly cham cong</h2>
+                <button type="button" class="icon-button" data-close-modal>&times;</button>
+            </div>
+            <form id="attendanceForm" th:action="@{/cms/attendance}" th:object="${attendanceForm}" method="post">
+                <div class="modal-body grid two-columns">
+                    <div class="field">
+                        <label for="employeeId">Nhan vien</label>
+                        <select id="employeeId" th:field="*{employeeId}" data-field="employeeId">
+                            <option value="">-- Chon nhan vien --</option>
+                            <option th:each="employee : ${employees}"
+                                    th:value="${employee.id}"
+                                    th:text="${employee.fullName}">Employee</option>
+                        </select>
+                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="workDate">Ngay lam</label>
+                        <input id="workDate" th:field="*{workDate}" data-field="workDate" type="date">
+                        <small th:if="${#fields.hasErrors('workDate')}" th:errors="*{workDate}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="checkIn">Gio vao</label>
+                        <input id="checkIn" th:field="*{checkIn}" data-field="checkIn" type="time">
+                    </div>
+                    <div class="field">
+                        <label for="checkOut">Gio ra</label>
+                        <input id="checkOut" th:field="*{checkOut}" data-field="checkOut" type="time">
+                    </div>
+                    <div class="field">
+                        <label for="workedHours">So gio</label>
+                        <input id="workedHours" th:field="*{workedHours}" data-field="workedHours" type="number" step="0.25">
+                    </div>
+                    <div class="field">
+                        <label for="notes">Ghi chu</label>
+                        <textarea id="notes" th:field="*{notes}" data-field="notes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button secondary" data-close-modal>Huy</button>
+                    <button type="submit" class="button" data-modal-submit>Luu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

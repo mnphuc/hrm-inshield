@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0002-roles-seed
+      author: codex
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ADMIN
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: HR
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: MANAGER
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: EMPLOYEE
+
+  - changeSet:
+      id: 0002-admin-user
+      author: codex
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: email
+                  value: admin@techshield.vn
+              - column:
+                  name: password
+                  value: "$2b$10$1CiUFXwl.04cE1YXXuMtF.rGEESCAyfyf9vw4GTWUQte6Y0yHzrU."
+              - column:
+                  name: enabled
+                  valueBoolean: true
+              - column:
+                  name: account_non_locked
+                  valueBoolean: true
+        - sql:
+            sql: |
+              INSERT INTO user_roles (user_id, role_id)
+              SELECT u.id, r.id
+              FROM users u
+              JOIN roles r ON r.name = 'ADMIN'
+              WHERE u.username = 'admin';

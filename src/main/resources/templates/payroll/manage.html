@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section th:fragment="content" class="grid two-columns">
+    <div class="card">
+        <form th:action="@{/cms/payrolls}" th:object="${payrollForm}" method="post" class="form-grid">
+            <div class="field">
+                <label for="payrollEmployee">Employee</label>
+                <select id="payrollEmployee" th:field="*{employeeId}">
+                    <option value="">-- Select employee --</option>
+                    <option th:each="employee : ${employees}"
+                            th:value="${employee.id}"
+                            th:text="${employee.fullName}">Employee</option>
+                </select>
+                <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Invalid</small>
+            </div>
+            <div class="field">
+                <label for="payrollYear">Year</label>
+                <input id="payrollYear" th:field="*{payrollYear}" type="number" min="2000" placeholder="2025">
+                <small th:if="${#fields.hasErrors('payrollYear')}" th:errors="*{payrollYear}" class="error-text">Invalid</small>
+            </div>
+            <div class="field">
+                <label for="payrollMonth">Month</label>
+                <input id="payrollMonth" th:field="*{payrollMonth}" type="number" min="1" max="12" placeholder="10">
+                <small th:if="${#fields.hasErrors('payrollMonth')}" th:errors="*{payrollMonth}" class="error-text">Invalid</small>
+            </div>
+            <div class="field">
+                <label for="baseSalary">Base salary</label>
+                <input id="baseSalary" th:field="*{baseSalary}" type="number" step="0.01">
+            </div>
+            <div class="field">
+                <label for="overtimeHours">Overtime hours</label>
+                <input id="overtimeHours" th:field="*{overtimeHours}" type="number" step="0.25">
+            </div>
+            <div class="field">
+                <label for="overtimeAmount">Overtime amount</label>
+                <input id="overtimeAmount" th:field="*{overtimeAmount}" type="number" step="0.01">
+            </div>
+            <div class="field">
+                <label for="bonus">Bonus</label>
+                <input id="bonus" th:field="*{bonus}" type="number" step="0.01">
+            </div>
+            <div class="field">
+                <label for="deductions">Deductions</label>
+                <input id="deductions" th:field="*{deductions}" type="number" step="0.01">
+            </div>
+            <div class="actions">
+                <button type="submit">Generate payroll</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <form class="filters" method="get" th:action="@{/cms/payrolls}">
+            <select name="employeeId">
+                <option value="">-- All employees --</option>
+                <option th:each="employee : ${employees}"
+                        th:value="${employee.id}"
+                        th:selected="${employee.id == selectedEmployeeId}"
+                        th:text="${employee.fullName}">Employee</option>
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Period</th>
+                <th>Base</th>
+                <th>Overtime</th>
+                <th>Bonus</th>
+                <th>Deductions</th>
+                <th>Net pay</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="payroll : ${payrolls}">
+                <td th:text="${#lists.find(employees, e -> e.id == payroll.employeeId)?.fullName}">Employee</td>
+                <td th:text="${payroll.payrollMonth + '/' + payroll.payrollYear}">10/2025</td>
+                <td th:text="${#numbers.formatDecimal(payroll.baseSalary, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
+                <td>
+                    <span th:text="${payroll.overtimeHours}">0</span>h /
+                    <span th:text="${#numbers.formatDecimal(payroll.overtimeAmount, 1, 'DEFAULT', 2, 'DEFAULT')}">0</span>
+                </td>
+                <td th:text="${#numbers.formatDecimal(payroll.bonus, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
+                <td th:text="${#numbers.formatDecimal(payroll.deductions, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
+                <td class="highlight" th:text="${#numbers.formatDecimal(payroll.netPay, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
+            </tr>
+            <tr th:if="${payrolls.isEmpty()}">
+                <td colspan="7" class="empty">No payroll entries</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</html>

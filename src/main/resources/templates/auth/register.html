@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section th:fragment="content">
+    <div class="card">
+        <form th:action="@{/auth/register}" th:object="${registerForm}" method="post" class="form-grid">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error</div>
+
+            <div class="field">
+                <label for="username">Username</label>
+                <input id="username" th:field="*{username}" type="text" placeholder="techshield.admin">
+                <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-text">Invalid</small>
+            </div>
+
+            <div class="field">
+                <label for="email">Email</label>
+                <input id="email" th:field="*{email}" type="email" placeholder="admin@techshield.vn">
+                <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text">Invalid</small>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" th:field="*{password}" type="password" placeholder="********">
+                <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-text">Invalid</small>
+            </div>
+
+            <div class="field">
+                <label for="employeeCode">Employee Code</label>
+                <input id="employeeCode" th:field="*{employeeCode}" type="text" placeholder="EMP-001">
+            </div>
+
+            <div class="field">
+                <label for="fullName">Full name</label>
+                <input id="fullName" th:field="*{fullName}" type="text" placeholder="Nguyen Van A">
+                <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error-text">Invalid</small>
+            </div>
+
+            <div class="field">
+                <label for="phone">Phone</label>
+                <input id="phone" th:field="*{phone}" type="text" placeholder="0987xxx">
+            </div>
+
+            <div class="field">
+                <label for="department">Department</label>
+                <input id="department" th:field="*{department}" type="text" placeholder="HR">
+            </div>
+
+            <div class="field">
+                <label for="position">Position</label>
+                <input id="position" th:field="*{position}" type="text" placeholder="Manager">
+            </div>
+
+            <div class="field">
+                <label for="hireDate">Hire date</label>
+                <input id="hireDate" th:field="*{hireDate}" type="date">
+            </div>
+
+            <div class="field">
+                <label for="baseSalary">Base salary</label>
+                <input id="baseSalary" th:field="*{baseSalary}" type="number" step="0.01" placeholder="15000000">
+            </div>
+
+            <div class="field">
+                <label>Roles</label>
+                <div class="checkbox-group">
+                    <label th:each="role : ${roleOptions}">
+                        <input type="checkbox" th:value="${role}" th:field="*{roles}">
+                        <span th:text="${role}">ROLE</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit">Create user</button>
+            </div>
+        </form>
+    </div>
+</section>
+</html>

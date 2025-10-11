@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section th:fragment="content">
+    <div class="card">
+        <div class="table-actions">
+            <div>
+                <button type="button" class="button" data-open-modal="projectModal" data-mode="create">
+                    + Them du an
+                </button>
+            </div>
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a class="page-link"
+                   th:classappend="${currentPage == 0}? 'disabled'"
+                   th:href="${currentPage == 0}? '#': @{/cms/projects(page=${currentPage - 1}, size=${pageSize})}">Prev</a>
+                <a class="page-link"
+                   th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:text="${pageNum + 1}"
+                   th:href="@{/cms/projects(page=${pageNum}, size=${pageSize})}"
+                   th:classappend="${pageNum == currentPage}? 'active'">1</a>
+                <a class="page-link"
+                   th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
+                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/projects(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Ma</th>
+                    <th>Ten du an</th>
+                    <th>Trang thai</th>
+                    <th>Thoi gian</th>
+                    <th>Quan ly</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="project : ${projects}">
+                    <td th:text="${project.code}">PRJ-001</td>
+                    <td th:text="${project.name}">Du an</td>
+                    <td th:text="${project.status}">ACTIVE</td>
+                    <td>
+                        <span th:text="${project.startDate}">2024-01-01</span>
+                        <span> - </span>
+                        <span th:text="${project.endDate}">2024-03-31</span>
+                    </td>
+                    <td th:text="${#lists.find(employees, e -> e.id == project.managerId)?.fullName}">Manager</td>
+                    <td class="actions-cell">
+                        <button type="button" class="button-link" data-open-modal="projectModal" data-mode="edit"
+                                th:attr="data-record-id=${project.id},
+                                         data-value-code=${project.code},
+                                         data-value-name=${project.name},
+                                         data-value-description=${project.description},
+                                         data-value-start-date=${project.startDate},
+                                         data-value-end-date=${project.endDate},
+                                         data-value-status=${project.status},
+                                         data-value-manager-id=${project.managerId}">
+                            Chinh sua
+                        </button>
+                        <button type="button" class="button-link" data-open-modal="assignmentModal" data-mode="create"
+                                th:attr="data-value-project-id=${project.id},
+                                         data-value-project-name=${project.name}">
+                            Gan nhan su
+                        </button>
+                        <form th:action="@{/cms/projects/{id}/delete(id=${project.id})}" method="post"
+                              th:attr="data-confirm-message=${'Ban co muon xoa du an ' + project.name + '?'}">
+                            <button type="submit" class="link danger">Xoa</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${projects.isEmpty()}">
+                    <td colspan="6" class="empty">Chua co du an nao</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-summary" th:if="${totalElements > 0}">
+            <span th:text="${'Dang hien thi ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' du an'}">Summary</span>
+        </div>
+    </div>
+
+    <div class="card assignment-list" th:if="${!projects.isEmpty()}">
+        <h2>Phan cong</h2>
+        <div th:each="project : ${projects}" class="assignment-group">
+            <h3 th:text="${project.name}">Project</h3>
+            <table class="data-table condensed">
+                <thead>
+                <tr>
+                    <th>Nhan vien</th>
+                    <th>Vai tro</th>
+                    <th>Ty le</th>
+                    <th>Thoi gian</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="assignment : ${assignmentMap[project.id]}">
+                    <td th:text="${#lists.find(employees, e -> e.id == assignment.employeeId)?.fullName}">Employee</td>
+                    <td th:text="${assignment.roleName}">Role</td>
+                    <td th:text="${assignment.allocationPercent}">100</td>
+                    <td>
+                        <span th:text="${assignment.startDate}">2024-01-01</span>
+                        <span> - </span>
+                        <span th:text="${assignment.endDate}">2024-02-01</span>
+                    </td>
+                    <td class="actions-cell">
+                        <form th:action="@{/cms/projects/assignments/{id}/delete(id=${assignment.id})}" method="post"
+                              th:attr="data-confirm-message=${'Xoa phan cong cua ' + (#lists.find(employees, e -> e.id == assignment.employeeId)?.fullName)}">
+                            <button type="submit" class="link danger">Xoa</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${assignmentMap[project.id] == null || assignmentMap[project.id].isEmpty()}">
+                    <td colspan="5" class="empty">Chua co phan cong</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-backdrop"
+         id="projectModal"
+         data-modal
+         th:data-open="${showProjectModal} ? 'true' : 'false'"
+         th:data-mode="${projectModalMode}"
+         th:data-record-id="${projectEditId}"
+         th:data-create-url="@{/cms/projects}"
+         th:data-update-template="@{/cms/projects/__ID__/update}"
+         data-create-title="Them du an"
+         data-edit-title="Cap nhat du an"
+         data-create-text="Luu"
+         data-edit-text="Cap nhat">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-modal-title>Quan ly du an</h2>
+                <button type="button" class="icon-button" data-close-modal>&times;</button>
+            </div>
+            <form id="projectForm" th:action="@{/cms/projects}" th:object="${projectForm}" method="post">
+                <div class="modal-body grid two-columns">
+                    <div class="field">
+                        <label for="projectCode">Ma du an</label>
+                        <input id="projectCode" th:field="*{code}" data-field="code" type="text" placeholder="PRJ-001">
+                        <small th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="projectName">Ten du an</label>
+                        <input id="projectName" th:field="*{name}" data-field="name" type="text" placeholder="Du an A">
+                        <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="projectDescription">Mo ta</label>
+                        <textarea id="projectDescription" th:field="*{description}" data-field="description" rows="3"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="projectStart">Ngay bat dau</label>
+                        <input id="projectStart" th:field="*{startDate}" data-field="startDate" type="date">
+                        <small th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="projectEnd">Ngay ket thuc</label>
+                        <input id="projectEnd" th:field="*{endDate}" data-field="endDate" type="date">
+                    </div>
+                    <div class="field">
+                        <label for="projectStatus">Trang thai</label>
+                        <select id="projectStatus" th:field="*{status}" data-field="status">
+                            <option value="">-- Chon trang thai --</option>
+                            <option th:each="status : ${projectStatuses}"
+                                    th:value="${status}"
+                                    th:text="${status}">Status</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="projectManager">Quan ly</label>
+                        <select id="projectManager" th:field="*{managerId}" data-field="managerId">
+                            <option value="">-- Khong co --</option>
+                            <option th:each="employee : ${employees}"
+                                    th:value="${employee.id}"
+                                    th:text="${employee.fullName}">Employee</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button secondary" data-close-modal>Huy</button>
+                    <button type="submit" class="button" data-modal-submit>Luu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop"
+         id="assignmentModal"
+         data-modal
+         th:data-open="${showAssignmentModal} ? 'true' : 'false'"
+         data-mode="create"
+         th:data-create-url="@{/cms/projects/assign}"
+         data-create-title="Gan nhan su"
+         data-create-text="Gan">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-modal-title>Gan nhan su</h2>
+                <button type="button" class="icon-button" data-close-modal>&times;</button>
+            </div>
+            <form id="assignmentForm" th:action="@{/cms/projects/assign}" th:object="${assignmentForm}" method="post">
+                <div class="modal-body grid two-columns">
+                    <div class="field">
+                        <label for="assignmentProject">Du an</label>
+                        <select id="assignmentProject" th:field="*{projectId}" data-field="projectId">
+                            <option value="">-- Chon du an --</option>
+                            <option th:each="project : ${projects}"
+                                    th:value="${project.id}"
+                                    th:text="${project.name}">Project</option>
+                        </select>
+                        <small th:if="${#fields.hasErrors('projectId')}" th:errors="*{projectId}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="assignmentEmployee">Nhan vien</label>
+                        <select id="assignmentEmployee" th:field="*{employeeId}" data-field="employeeId">
+                            <option value="">-- Chon nhan vien --</option>
+                            <option th:each="employee : ${employees}"
+                                    th:value="${employee.id}"
+                                    th:text="${employee.fullName}">Employee</option>
+                        </select>
+                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="assignmentRole">Vai tro</label>
+                        <input id="assignmentRole" th:field="*{roleName}" data-field="roleName" type="text" placeholder="Developer">
+                    </div>
+                    <div class="field">
+                        <label for="assignmentAllocation">Ty le (%)</label>
+                        <input id="assignmentAllocation" th:field="*{allocationPercent}" data-field="allocationPercent" type="number" step="1">
+                    </div>
+                    <div class="field">
+                        <label for="assignmentStart">Ngay bat dau</label>
+                        <input id="assignmentStart" th:field="*{startDate}" data-field="startDate" type="date">
+                        <small th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="assignmentEnd">Ngay ket thuc</label>
+                        <input id="assignmentEnd" th:field="*{endDate}" data-field="endDate" type="date">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button secondary" data-close-modal>Huy</button>
+                    <button type="submit" class="button" data-modal-submit>Gan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

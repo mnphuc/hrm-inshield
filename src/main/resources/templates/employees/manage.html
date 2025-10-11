@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section th:fragment="content">
+    <div class="card">
+        <div class="table-actions">
+            <div>
+                <button type="button" class="button" data-open-modal="employeeModal" data-mode="create">
+                    + Them nhan vien
+                </button>
+            </div>
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a class="page-link"
+                   th:classappend="${currentPage == 0}? 'disabled'"
+                   th:href="${currentPage == 0}? '#': @{/cms/employees(page=${currentPage - 1}, size=${pageSize})}">Prev</a>
+                <a class="page-link"
+                   th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:text="${pageNum + 1}"
+                   th:href="@{/cms/employees(page=${pageNum}, size=${pageSize})}"
+                   th:classappend="${pageNum == currentPage}? 'active'">1</a>
+                <a class="page-link"
+                   th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
+                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/employees(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Ma</th>
+                    <th>Ho ten</th>
+                    <th>Phong ban</th>
+                    <th>Chuc vu</th>
+                    <th>Ngay vao</th>
+                    <th>Trang thai</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="employee : ${employees}">
+                    <td th:text="${employee.code}">EMP-001</td>
+                    <td th:text="${employee.fullName}">Nguyen Van A</td>
+                    <td th:text="${employee.department}">Tech</td>
+                    <td th:text="${employee.position}">Developer</td>
+                    <td th:text="${employee.hireDate}">2024-01-01</td>
+                    <td th:text="${employee.employmentStatus}">ACTIVE</td>
+                    <td class="actions-cell">
+                <button type="button" class="button-link" data-open-modal="employeeModal" data-mode="edit"
+                                th:attr="data-record-id=${employee.id},
+                                         data-value-code=${employee.code},
+                                         data-value-full-name=${employee.fullName},
+                                         data-value-email=${employee.email},
+                                         data-value-phone=${employee.phone},
+                                         data-value-department=${employee.department},
+                                         data-value-position=${employee.position},
+                                         data-value-hire-date=${employee.hireDate},
+                                         data-value-termination-date=${employee.terminationDate},
+                                         data-value-employment-status=${employee.employmentStatus},
+                                         data-value-base-salary=${employee.baseSalary},
+                                         data-value-manager-id=${employee.managerId},
+                                         data-value-user-id=${employee.userId}">
+                            Chinh sua
+                        </button>
+                        <form th:action="@{/cms/employees/{id}/delete(id=${employee.id})}" method="post"
+                              th:attr="data-confirm-message=${'Ban co chac muon xoa ' + employee.fullName + '?'}">
+                            <button type="submit" class="link danger">Xoa</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${employees.isEmpty()}">
+                    <td colspan="7" class="empty">Chua co nhan vien nao</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-summary" th:if="${totalElements > 0}">
+            <span th:text="${'Dang hien thi ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' nhan vien'}">Summary</span>
+        </div>
+    </div>
+
+    <div class="modal-backdrop"
+         id="employeeModal"
+         data-modal
+         th:data-open="${showModal} ? 'true' : 'false'"
+         th:data-mode="${modalMode}"
+         th:data-record-id="${editId}"
+         th:data-create-url="@{/cms/employees}"
+         th:data-update-template="@{/cms/employees/__ID__/update}"
+         data-create-title="Them nhan vien"
+         data-edit-title="Cap nhat nhan vien"
+         data-create-text="Luu"
+         data-edit-text="Cap nhat">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-modal-title>Quan ly nhan vien</h2>
+                <button type="button" class="icon-button" data-close-modal>&times;</button>
+            </div>
+            <form id="employeeForm" th:action="@{/cms/employees}" th:object="${employeeForm}" method="post">
+                <div class="modal-body grid two-columns">
+                    <div class="field">
+                        <label for="code">Ma nhan vien</label>
+                        <input id="code" th:field="*{code}" data-field="code" type="text" placeholder="EMP-001">
+                        <small th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="fullName">Ho ten</label>
+                        <input id="fullName" th:field="*{fullName}" data-field="fullName" type="text" placeholder="Nguyen Van A">
+                        <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" th:field="*{email}" data-field="email" type="email" placeholder="user@techshield.vn">
+                        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="phone">Dien thoai</label>
+                        <input id="phone" th:field="*{phone}" data-field="phone" type="text">
+                    </div>
+                    <div class="field">
+                        <label for="department">Phong ban</label>
+                        <input id="department" th:field="*{department}" data-field="department" type="text">
+                    </div>
+                    <div class="field">
+                        <label for="position">Chuc vu</label>
+                        <input id="position" th:field="*{position}" data-field="position" type="text">
+                    </div>
+                    <div class="field">
+                        <label for="hireDate">Ngay vao lam</label>
+                        <input id="hireDate" th:field="*{hireDate}" data-field="hireDate" type="date">
+                        <small th:if="${#fields.hasErrors('hireDate')}" th:errors="*{hireDate}" class="error-text">Error</small>
+                    </div>
+                    <div class="field">
+                        <label for="terminationDate">Ngay nghi viec</label>
+                        <input id="terminationDate" th:field="*{terminationDate}" data-field="terminationDate" type="date">
+                    </div>
+                    <div class="field">
+                        <label for="employmentStatus">Trang thai</label>
+                        <input id="employmentStatus" th:field="*{employmentStatus}" data-field="employmentStatus" type="text" placeholder="ACTIVE">
+                    </div>
+                    <div class="field">
+                        <label for="baseSalary">Luong co ban</label>
+                        <input id="baseSalary" th:field="*{baseSalary}" data-field="baseSalary" type="number" step="0.01">
+                    </div>
+                    <div class="field">
+                        <label for="managerId">Quan ly truc tiep</label>
+                        <select id="managerId" th:field="*{managerId}" data-field="managerId">
+                            <option value="">-- Khong co --</option>
+                            <option th:each="manager : ${managerOptions}"
+                                    th:value="${manager.id}"
+                                    th:text="${manager.fullName}">Manager</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="userId">Tai khoan lien ket</label>
+                        <input id="userId" th:field="*{userId}" data-field="userId" type="number" placeholder="ID tai khoan">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button secondary" data-close-modal>Huy</button>
+                    <button type="submit" class="button" data-modal-submit>Luu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

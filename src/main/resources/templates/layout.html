@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'TechShield CMS - ' + (${pageTitle} ?: 'Dashboard')">TechShield CMS</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-title">TechShield</span>
+            <span class="brand-sub">Insight CMS</span>
+        </div>
+        <nav class="nav">
+            <a th:href="@{/dashboard}"
+               th:classappend="${currentPath != null and currentPath == '/dashboard'} ? 'active' : ''">Dashboard</a>
+            <a th:href="@{/cms/employees}"
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/employees')} ? 'active' : ''">Employees</a>
+            <a th:href="@{/cms/attendance}"
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/attendance')} ? 'active' : ''">Attendance</a>
+            <a th:href="@{/cms/projects}"
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/projects')} ? 'active' : ''">Projects</a>
+            <a th:href="@{/cms/expenses}"
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/expenses')} ? 'active' : ''">Expenses</a>
+            <a th:href="@{/cms/leave}"
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/leave')} ? 'active' : ''">Leave</a>
+            <a th:href="@{/cms/payrolls}"
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/payrolls')} ? 'active' : ''">Payroll</a>
+            <a th:href="@{/auth/register}"
+               th:classappend="${currentPath != null and currentPath.startsWith('/auth')} ? 'active' : ''">Users</a>
+        </nav>
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit">Logout</button>
+        </form>
+    </aside>
+    <main class="main">
+        <header class="page-heading">
+            <div>
+                <h1 th:text="${pageHeader} ?: 'Dashboard'">Dashboard</h1>
+                <p class="breadcrumb" th:text="${pageTitle} ?: 'Overview'">Overview</p>
+            </div>
+        </header>
+        <section class="alerts">
+            <div th:if="${successMessage}" class="alert success" th:text="${successMessage}">Success</div>
+            <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}">Error</div>
+        </section>
+        <section class="page-content" th:insert="${content}">
+            <p>Content placeholder</p>
+        </section>
+    </main>
+</div>
+</body>
+</html>
