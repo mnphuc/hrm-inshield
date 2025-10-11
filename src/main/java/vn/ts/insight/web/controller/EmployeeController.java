@@ -44,8 +44,8 @@ public class EmployeeController {
         if (!model.containsAttribute("showModal")) {
             model.addAttribute("showModal", false);
         }
-        model.addAttribute("pageTitle", "Quan ly nhan vien");
-        model.addAttribute("pageHeader", "Danh sach nhan su");
+        model.addAttribute("pageTitle", "Quản lý nhân viên");
+        model.addAttribute("pageHeader", "Danh sách nhân sự");
         return "employees/manage";
     }
 
@@ -61,12 +61,12 @@ public class EmployeeController {
             redirectAttributes.addFlashAttribute("employeeForm", request);
             redirectAttributes.addFlashAttribute("modalMode", "create");
             redirectAttributes.addFlashAttribute("showModal", true);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra lai thong tin nhap");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin nhập");
             return "redirect:/cms/employees";
         }
 
         employeeService.create(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da them nhan vien moi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã thêm nhân viên mới");
         return "redirect:/cms/employees";
     }
 
@@ -84,19 +84,19 @@ public class EmployeeController {
             redirectAttributes.addFlashAttribute("editId", id);
             redirectAttributes.addFlashAttribute("modalMode", "edit");
             redirectAttributes.addFlashAttribute("showModal", true);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra lai thong tin nhap");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin nhập");
             return "redirect:/cms/employees";
         }
 
         employeeService.update(id, request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da cap nhat nhan vien");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật nhân viên");
         return "redirect:/cms/employees";
     }
 
     @PostMapping("/{id}/delete")
     public String deleteEmployee(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         employeeService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Da xoa nhan vien");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa nhân viên");
         return "redirect:/cms/employees";
     }
 

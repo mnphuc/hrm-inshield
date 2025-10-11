@@ -14,15 +14,15 @@ public class HomeController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("pageTitle", "Tong quan");
-        model.addAttribute("pageHeader", "Bang dieu khien");
+        model.addAttribute("pageTitle", "Tổng quan");
+        model.addAttribute("pageHeader", "Bảng điều khiển");
         return "dashboard";
     }
 
     @GetMapping("/login")
     public String login(Model model) {
-        model.addAttribute("pageTitle", "Dang nhap");
-        model.addAttribute("pageHeader", "Truy cap he thong");
+        model.addAttribute("pageTitle", "Đăng nhập");
+        model.addAttribute("pageHeader", "Truy cập hệ thống");
         return "login";
     }
 }

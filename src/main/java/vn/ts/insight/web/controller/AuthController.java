@@ -48,7 +48,7 @@ public class AuthController {
 
         try {
             authService.register(request);
-            redirectAttributes.addFlashAttribute("successMessage", "Da tao tai khoan thanh cong");
+            redirectAttributes.addFlashAttribute("successMessage", "Đã tạo tài khoản thành công");
             return "redirect:/auth/register";
         } catch (IllegalArgumentException ex) {
             bindingResult.reject("registerError", ex.getMessage());
@@ -58,8 +58,8 @@ public class AuthController {
     }
 
     private void prepareModel(Model model) {
-        model.addAttribute("pageTitle", "Tao tai khoan");
-        model.addAttribute("pageHeader", "Dang ky nguoi dung moi");
+        model.addAttribute("pageTitle", "Tạo tài khoản");
+        model.addAttribute("pageHeader", "Đăng ký người dùng mới");
         model.addAttribute("roleOptions", SystemRoleName.values());
     }
 }

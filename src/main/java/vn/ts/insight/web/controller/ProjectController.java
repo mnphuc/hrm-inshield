@@ -43,8 +43,8 @@ public class ProjectController {
         @RequestParam(value = "size", defaultValue = "10") int size,
         Model model
     ) {
-        model.addAttribute("pageTitle", "Du an");
-        model.addAttribute("pageHeader", "Quan ly du an");
+        model.addAttribute("pageTitle", "Dự án");
+        model.addAttribute("pageHeader", "Quản lý dự án");
         populateModel(model, page, size);
         if (!model.containsAttribute("projectForm")) {
             model.addAttribute("projectForm", new ProjectRequest());
@@ -75,12 +75,12 @@ public class ProjectController {
             redirectAttributes.addFlashAttribute("projectForm", request);
             redirectAttributes.addFlashAttribute("projectModalMode", "create");
             redirectAttributes.addFlashAttribute("showProjectModal", true);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra thong tin du an");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra thông tin dự án");
             return "redirect:/cms/projects";
         }
 
         projectService.create(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da tao du an moi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã tạo dự án mới");
         return "redirect:/cms/projects";
     }
 
@@ -97,19 +97,19 @@ public class ProjectController {
             redirectAttributes.addFlashAttribute("projectModalMode", "edit");
             redirectAttributes.addFlashAttribute("showProjectModal", true);
             redirectAttributes.addFlashAttribute("projectEditId", id);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra thong tin du an");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra thông tin dự án");
             return "redirect:/cms/projects";
         }
 
         projectService.update(id, request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da cap nhat du an");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật dự án");
         return "redirect:/cms/projects";
     }
 
     @PostMapping("/{id}/delete")
     public String deleteProject(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         projectService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Da xoa du an");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa dự án");
         return "redirect:/cms/projects";
     }
 
@@ -124,19 +124,19 @@ public class ProjectController {
             redirectAttributes.addFlashAttribute("assignmentForm", request);
             redirectAttributes.addFlashAttribute("showAssignmentModal", true);
             redirectAttributes.addFlashAttribute("assignmentProjectId", request.getProjectId());
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra thong tin phan cong");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra thông tin phân công");
             return "redirect:/cms/projects";
         }
 
         projectService.assign(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da gan nhan su vao du an");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã gán nhân sự vào dự án");
         return "redirect:/cms/projects";
     }
 
     @PostMapping("/assignments/{assignmentId}/delete")
     public String removeAssignment(@PathVariable Long assignmentId, RedirectAttributes redirectAttributes) {
         projectService.removeAssignment(assignmentId);
-        redirectAttributes.addFlashAttribute("successMessage", "Da xoa phan cong du an");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa phân công dự án");
         return "redirect:/cms/projects";
     }
 

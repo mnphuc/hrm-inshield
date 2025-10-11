@@ -36,8 +36,8 @@ public class PayrollController {
         @RequestParam(value = "employeeId", required = false) Long employeeId,
         Model model
     ) {
-        model.addAttribute("pageTitle", "Bang luong");
-        model.addAttribute("pageHeader", "Quan ly bang luong");
+        model.addAttribute("pageTitle", "Bảng lương");
+        model.addAttribute("pageHeader", "Quản lý bảng lương");
         populateModel(model, employeeId);
         if (!model.containsAttribute("payrollForm")) {
             model.addAttribute("payrollForm", new PayrollRequest());
@@ -55,14 +55,14 @@ public class PayrollController {
         RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", "Bang luong");
-            model.addAttribute("pageHeader", "Quan ly bang luong");
+            model.addAttribute("pageTitle", "Bảng lương");
+            model.addAttribute("pageHeader", "Quản lý bảng lương");
             populateModel(model, null);
             return "payroll/manage";
         }
 
         payrollService.generate(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da tao/cap nhat bang luong");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã tạo/cập nhật bảng lương");
         return "redirect:/cms/payrolls";
     }
 

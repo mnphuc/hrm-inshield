@@ -5,13 +5,13 @@
         <div class="table-actions">
             <div>
                 <button type="button" class="button" data-open-modal="projectModal" data-mode="create">
-                    + Them du an
+                    + Thêm dự án
                 </button>
             </div>
             <div class="pagination" th:if="${totalPages > 1}">
                 <a class="page-link"
                    th:classappend="${currentPage == 0}? 'disabled'"
-                   th:href="${currentPage == 0}? '#': @{/cms/projects(page=${currentPage - 1}, size=${pageSize})}">Prev</a>
+                   th:href="${currentPage == 0}? '#': @{/cms/projects(page=${currentPage - 1}, size=${pageSize})}">Trang trước</a>
                 <a class="page-link"
                    th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
                    th:text="${pageNum + 1}"
@@ -19,32 +19,32 @@
                    th:classappend="${pageNum == currentPage}? 'active'">1</a>
                 <a class="page-link"
                    th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
-                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/projects(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/projects(page=${currentPage + 1}, size=${pageSize})}">Trang sau</a>
             </div>
         </div>
         <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                 <tr>
-                    <th>Ma</th>
-                    <th>Ten du an</th>
-                    <th>Trang thai</th>
-                    <th>Thoi gian</th>
-                    <th>Quan ly</th>
+                    <th>Mã</th>
+                    <th>Tên dự án</th>
+                    <th>Trạng thái</th>
+                    <th>Thời gian</th>
+                    <th>Quản lý</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="project : ${projects}">
                     <td th:text="${project.code}">PRJ-001</td>
-                    <td th:text="${project.name}">Du an</td>
+                    <td th:text="${project.name}">Dự án</td>
                     <td th:text="${project.status}">ACTIVE</td>
                     <td>
                         <span th:text="${project.startDate}">2024-01-01</span>
                         <span> - </span>
                         <span th:text="${project.endDate}">2024-03-31</span>
                     </td>
-                    <td th:text="${#lists.find(employees, e -> e.id == project.managerId)?.fullName}">Manager</td>
+                    <td th:text="${#lists.find(employees, e -> e.id == project.managerId)?.fullName}">Quản lý</td>
                     <td class="actions-cell">
                         <button type="button" class="button-link" data-open-modal="projectModal" data-mode="edit"
                                 th:attr="data-record-id=${project.id},
@@ -55,47 +55,47 @@
                                          data-value-end-date=${project.endDate},
                                          data-value-status=${project.status},
                                          data-value-manager-id=${project.managerId}">
-                            Chinh sua
+                            Chỉnh sửa
                         </button>
                         <button type="button" class="button-link" data-open-modal="assignmentModal" data-mode="create"
                                 th:attr="data-value-project-id=${project.id},
                                          data-value-project-name=${project.name}">
-                            Gan nhan su
+                            Gán nhân sự
                         </button>
                         <form th:action="@{/cms/projects/{id}/delete(id=${project.id})}" method="post"
-                              th:attr="data-confirm-message=${'Ban co muon xoa du an ' + project.name + '?'}">
-                            <button type="submit" class="link danger">Xoa</button>
+                              th:attr="data-confirm-message=${'Bạn có muốn xóa dự án ' + project.name + '?'}">
+                            <button type="submit" class="link danger">Xóa</button>
                         </form>
                     </td>
                 </tr>
                 <tr th:if="${projects.isEmpty()}">
-                    <td colspan="6" class="empty">Chua co du an nao</td>
+                    <td colspan="6" class="empty">Chưa có dự án nào</td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <div class="table-summary" th:if="${totalElements > 0}">
-            <span th:text="${'Dang hien thi ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' du an'}">Summary</span>
+            <span th:text="${'Đang hiển thị ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' Dự án'}">Tổng quan</span>
         </div>
     </div>
 
     <div class="card assignment-list" th:if="${!projects.isEmpty()}">
-        <h2>Phan cong</h2>
+        <h2>Phân công</h2>
         <div th:each="project : ${projects}" class="assignment-group">
             <h3 th:text="${project.name}">Project</h3>
             <table class="data-table condensed">
                 <thead>
                 <tr>
-                    <th>Nhan vien</th>
-                    <th>Vai tro</th>
-                    <th>Ty le</th>
-                    <th>Thoi gian</th>
+                    <th>Nhân viên</th>
+                    <th>Vai trò</th>
+                    <th>Tỷ lệ</th>
+                    <th>Thời gian</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="assignment : ${assignmentMap[project.id]}">
-                    <td th:text="${#lists.find(employees, e -> e.id == assignment.employeeId)?.fullName}">Employee</td>
+                    <td th:text="${#lists.find(employees, e -> e.id == assignment.employeeId)?.fullName}">Nhân viên</td>
                     <td th:text="${assignment.roleName}">Role</td>
                     <td th:text="${assignment.allocationPercent}">100</td>
                     <td>
@@ -105,13 +105,13 @@
                     </td>
                     <td class="actions-cell">
                         <form th:action="@{/cms/projects/assignments/{id}/delete(id=${assignment.id})}" method="post"
-                              th:attr="data-confirm-message=${'Xoa phan cong cua ' + (#lists.find(employees, e -> e.id == assignment.employeeId)?.fullName)}">
-                            <button type="submit" class="link danger">Xoa</button>
+                              th:attr="data-confirm-message=${'Bạn có muốn xóa phân công của ' + (#lists.find(employees, e -> e.id == assignment.employeeId)?.fullName) + '?'}">
+                            <button type="submit" class="link danger">Xóa</button>
                         </form>
                     </td>
                 </tr>
                 <tr th:if="${assignmentMap[project.id] == null || assignmentMap[project.id].isEmpty()}">
-                    <td colspan="5" class="empty">Chua co phan cong</td>
+                    <td colspan="5" class="empty">Chưa có phân công</td>
                 </tr>
                 </tbody>
             </table>
@@ -126,62 +126,62 @@
          th:data-record-id="${projectEditId}"
          th:data-create-url="@{/cms/projects}"
          th:data-update-template="@{/cms/projects/__ID__/update}"
-         data-create-title="Them du an"
-         data-edit-title="Cap nhat du an"
-         data-create-text="Luu"
-         data-edit-text="Cap nhat">
+         data-create-title="Thêm dự án"
+         data-edit-title="Cập nhật dự án"
+         data-create-text="Lưu"
+         data-edit-text="Cập nhật">
         <div class="modal">
             <div class="modal-header">
-                <h2 data-modal-title>Quan ly du an</h2>
+                <h2 data-modal-title>Quản lý Dự án</h2>
                 <button type="button" class="icon-button" data-close-modal>&times;</button>
             </div>
             <form id="projectForm" th:action="@{/cms/projects}" th:object="${projectForm}" method="post">
                 <div class="modal-body grid two-columns">
                     <div class="field">
-                        <label for="projectCode">Ma du an</label>
+                        <label for="projectCode">Ma Dự án</label>
                         <input id="projectCode" th:field="*{code}" data-field="code" type="text" placeholder="PRJ-001">
-                        <small th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="projectName">Ten du an</label>
-                        <input id="projectName" th:field="*{name}" data-field="name" type="text" placeholder="Du an A">
-                        <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-text">Error</small>
+                        <label for="projectName">Ten Dự án</label>
+                        <input id="projectName" th:field="*{name}" data-field="name" type="text" placeholder="Dự án A">
+                        <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="projectDescription">Mo ta</label>
+                        <label for="projectDescription">Mô tả</label>
                         <textarea id="projectDescription" th:field="*{description}" data-field="description" rows="3"></textarea>
                     </div>
                     <div class="field">
-                        <label for="projectStart">Ngay bat dau</label>
+                        <label for="projectStart">Ngày bắt đầu</label>
                         <input id="projectStart" th:field="*{startDate}" data-field="startDate" type="date">
-                        <small th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="projectEnd">Ngay ket thuc</label>
+                        <label for="projectEnd">Ngày kết thúc</label>
                         <input id="projectEnd" th:field="*{endDate}" data-field="endDate" type="date">
                     </div>
                     <div class="field">
-                        <label for="projectStatus">Trang thai</label>
+                        <label for="projectStatus">Trạng thái</label>
                         <select id="projectStatus" th:field="*{status}" data-field="status">
-                            <option value="">-- Chon trang thai --</option>
+                            <option value="">-- Chọn trạng thái --</option>
                             <option th:each="status : ${projectStatuses}"
                                     th:value="${status}"
                                     th:text="${status}">Status</option>
                         </select>
                     </div>
                     <div class="field">
-                        <label for="projectManager">Quan ly</label>
+                        <label for="projectManager">Quản lý</label>
                         <select id="projectManager" th:field="*{managerId}" data-field="managerId">
-                            <option value="">-- Khong co --</option>
+                            <option value="">-- Không có --</option>
                             <option th:each="employee : ${employees}"
                                     th:value="${employee.id}"
-                                    th:text="${employee.fullName}">Employee</option>
+                                    th:text="${employee.fullName}">Nhân viên</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="button secondary" data-close-modal>Huy</button>
-                    <button type="submit" class="button" data-modal-submit>Luu</button>
+                    <button type="button" class="button secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="button" data-modal-submit>Lưu</button>
                 </div>
             </form>
         </div>
@@ -193,59 +193,63 @@
          th:data-open="${showAssignmentModal} ? 'true' : 'false'"
          data-mode="create"
          th:data-create-url="@{/cms/projects/assign}"
-         data-create-title="Gan nhan su"
-         data-create-text="Gan">
+         data-create-title="Gán nhân sự"
+         data-create-text="Gán">
         <div class="modal">
             <div class="modal-header">
-                <h2 data-modal-title>Gan nhan su</h2>
+                <h2 data-modal-title>Gán nhân sự</h2>
                 <button type="button" class="icon-button" data-close-modal>&times;</button>
             </div>
             <form id="assignmentForm" th:action="@{/cms/projects/assign}" th:object="${assignmentForm}" method="post">
                 <div class="modal-body grid two-columns">
                     <div class="field">
-                        <label for="assignmentProject">Du an</label>
+                        <label for="assignmentProject">Dự án</label>
                         <select id="assignmentProject" th:field="*{projectId}" data-field="projectId">
-                            <option value="">-- Chon du an --</option>
+                            <option value="">-- Chọn dự án --</option>
                             <option th:each="project : ${projects}"
                                     th:value="${project.id}"
-                                    th:text="${project.name}">Project</option>
+                                    th:text="${project.name}">Dự án</option>
                         </select>
-                        <small th:if="${#fields.hasErrors('projectId')}" th:errors="*{projectId}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('projectId')}" th:errors="*{projectId}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="assignmentEmployee">Nhan vien</label>
+                        <label for="assignmentEmployee">Nhân viên</label>
                         <select id="assignmentEmployee" th:field="*{employeeId}" data-field="employeeId">
-                            <option value="">-- Chon nhan vien --</option>
+                            <option value="">-- Chọn nhân viên --</option>
                             <option th:each="employee : ${employees}"
                                     th:value="${employee.id}"
-                                    th:text="${employee.fullName}">Employee</option>
+                                    th:text="${employee.fullName}">Nhân viên</option>
                         </select>
-                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="assignmentRole">Vai tro</label>
+                        <label for="assignmentRole">Vai trò</label>
                         <input id="assignmentRole" th:field="*{roleName}" data-field="roleName" type="text" placeholder="Developer">
                     </div>
                     <div class="field">
-                        <label for="assignmentAllocation">Ty le (%)</label>
+                        <label for="assignmentAllocation">Tỷ lệ (%)</label>
                         <input id="assignmentAllocation" th:field="*{allocationPercent}" data-field="allocationPercent" type="number" step="1">
                     </div>
                     <div class="field">
-                        <label for="assignmentStart">Ngay bat dau</label>
+                        <label for="assignmentStart">Ngày bắt đầu</label>
                         <input id="assignmentStart" th:field="*{startDate}" data-field="startDate" type="date">
-                        <small th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="assignmentEnd">Ngay ket thuc</label>
+                        <label for="assignmentEnd">Ngày kết thúc</label>
                         <input id="assignmentEnd" th:field="*{endDate}" data-field="endDate" type="date">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="button secondary" data-close-modal>Huy</button>
-                    <button type="submit" class="button" data-modal-submit>Gan</button>
+                    <button type="button" class="button secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="button" data-modal-submit>Gán</button>
                 </div>
             </form>
         </div>
     </div>
 </section>
 </html>
+
+
+
+

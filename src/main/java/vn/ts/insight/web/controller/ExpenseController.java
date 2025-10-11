@@ -48,8 +48,8 @@ public class ExpenseController {
         @RequestParam(value = "size", defaultValue = "10") int size,
         Model model
     ) {
-        model.addAttribute("pageTitle", "Chi phi");
-        model.addAttribute("pageHeader", "Quan ly chi phi");
+        model.addAttribute("pageTitle", "Chi phí");
+        model.addAttribute("pageHeader", "Quản lý chi phí");
         populateModel(model, page, size);
         if (!model.containsAttribute("expenseForm")) {
             model.addAttribute("expenseForm", new ExpenseRequest());
@@ -80,12 +80,12 @@ public class ExpenseController {
             redirectAttributes.addFlashAttribute("expenseForm", request);
             redirectAttributes.addFlashAttribute("expenseModalMode", "create");
             redirectAttributes.addFlashAttribute("showExpenseModal", true);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra thong tin chi phi");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra thông tin chi phí");
             return "redirect:/cms/expenses";
         }
 
         expenseService.submit(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da tao chi phi moi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã tạo chi phí mới");
         return "redirect:/cms/expenses";
     }
 
@@ -103,12 +103,12 @@ public class ExpenseController {
             redirectAttributes.addFlashAttribute("expenseModalMode", "edit");
             redirectAttributes.addFlashAttribute("showExpenseModal", true);
             redirectAttributes.addFlashAttribute("expenseEditId", id);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra thong tin chi phi");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra thông tin chi phí");
             return "redirect:/cms/expenses";
         }
 
         expenseService.update(id, request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da cap nhat chi phi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật chi phí");
         return "redirect:/cms/expenses";
     }
 
@@ -125,12 +125,12 @@ public class ExpenseController {
             redirectAttributes.addFlashAttribute("statusForm", request);
             redirectAttributes.addFlashAttribute("showStatusModal", true);
             redirectAttributes.addFlashAttribute("statusExpenseId", id);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long chon trang thai hop le");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng chọn trạng thái hợp lệ");
             return "redirect:/cms/expenses";
         }
 
         expenseService.updateStatus(id, request.getStatus());
-        redirectAttributes.addFlashAttribute("successMessage", "Da cap nhat trang thai chi phi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật trạng thái chi phí");
         return "redirect:/cms/expenses";
     }
 
@@ -138,7 +138,7 @@ public class ExpenseController {
     @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public String deleteExpense(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         expenseService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Da xoa chi phi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa chi phí");
         return "redirect:/cms/expenses";
     }
 

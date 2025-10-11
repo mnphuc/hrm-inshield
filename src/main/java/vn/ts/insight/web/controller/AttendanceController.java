@@ -38,8 +38,8 @@ public class AttendanceController {
         @RequestParam(value = "size", defaultValue = "10") int size,
         Model model
     ) {
-        model.addAttribute("pageTitle", "Cham cong");
-        model.addAttribute("pageHeader", "Quan ly cham cong");
+        model.addAttribute("pageTitle", "Chấm công");
+        model.addAttribute("pageHeader", "Quản lý chấm công");
         populateModel(model, page, size);
         if (!model.containsAttribute("attendanceForm")) {
             model.addAttribute("attendanceForm", new AttendanceRequest());
@@ -64,12 +64,12 @@ public class AttendanceController {
             redirectAttributes.addFlashAttribute("attendanceForm", request);
             redirectAttributes.addFlashAttribute("modalMode", "create");
             redirectAttributes.addFlashAttribute("showModal", true);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra lai thong tin");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
             return "redirect:/cms/attendance";
         }
 
         attendanceService.create(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da ghi nhan cham cong");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã ghi nhận chấm công");
         return "redirect:/cms/attendance";
     }
 
@@ -86,19 +86,19 @@ public class AttendanceController {
             redirectAttributes.addFlashAttribute("modalMode", "edit");
             redirectAttributes.addFlashAttribute("showModal", true);
             redirectAttributes.addFlashAttribute("editId", id);
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui long kiem tra lai thong tin");
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
             return "redirect:/cms/attendance";
         }
 
         attendanceService.update(id, request);
-        redirectAttributes.addFlashAttribute("successMessage", "Da cap nhat ban ghi cham cong");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật bản ghi chấm công");
         return "redirect:/cms/attendance";
     }
 
     @PostMapping("/{id}/delete")
     public String deleteAttendance(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         attendanceService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Da xoa ban ghi cham cong");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa bản ghi chấm công");
         return "redirect:/cms/attendance";
     }
 

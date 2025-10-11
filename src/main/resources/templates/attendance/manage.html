@@ -5,13 +5,13 @@
         <div class="table-actions">
             <div>
                 <button type="button" class="button" data-open-modal="attendanceModal" data-mode="create">
-                    + Them cham cong
+                    + Thêm chấm công
                 </button>
             </div>
             <div class="pagination" th:if="${totalPages > 1}">
                 <a class="page-link"
                    th:classappend="${currentPage == 0}? 'disabled'"
-                   th:href="${currentPage == 0}? '#': @{/cms/attendance(page=${currentPage - 1}, size=${pageSize})}">Prev</a>
+                   th:href="${currentPage == 0}? '#': @{/cms/attendance(page=${currentPage - 1}, size=${pageSize})}">Trang trước</a>
                 <a class="page-link"
                    th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
                    th:text="${pageNum + 1}"
@@ -19,30 +19,30 @@
                    th:classappend="${pageNum == currentPage}? 'active'">1</a>
                 <a class="page-link"
                    th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
-                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/attendance(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/attendance(page=${currentPage + 1}, size=${pageSize})}">Trang sau</a>
             </div>
         </div>
         <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                 <tr>
-                    <th>Nhan vien</th>
-                    <th>Ngay</th>
-                    <th>Vao</th>
+                    <th>Nhân viên</th>
+                    <th>Ngày</th>
+                    <th>Vào</th>
                     <th>Ra</th>
-                    <th>So gio</th>
-                    <th>Ghi chu</th>
+                    <th>Số giờ</th>
+                    <th>Ghi chú</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="record : ${records}">
-                    <td th:text="${#lists.find(employees, e -> e.id == record.employeeId)?.fullName}">Nhan vien</td>
+                    <td th:text="${#lists.find(employees, e -> e.id == record.employeeId)?.fullName}">Nhân viên</td>
                     <td th:text="${record.workDate}">2024-01-01</td>
                     <td th:text="${record.checkIn}">08:00</td>
                     <td th:text="${record.checkOut}">17:00</td>
                     <td th:text="${record.workedHours}">8</td>
-                    <td th:text="${record.notes}">Ghi chu</td>
+                    <td th:text="${record.notes}">Ghi chú</td>
                     <td class="actions-cell">
                         <button type="button" class="button-link" data-open-modal="attendanceModal" data-mode="edit"
                                 th:attr="data-record-id=${record.id},
@@ -52,22 +52,22 @@
                                          data-value-check-out=${record.checkOut},
                                          data-value-worked-hours=${record.workedHours},
                                          data-value-notes=${record.notes}">
-                            Chinh sua
+                            Chỉnh sửa
                         </button>
                         <form th:action="@{/cms/attendance/{id}/delete(id=${record.id})}" method="post"
-                              th:attr="data-confirm-message=${'Ban co chac muon xoa cham cong ngay ' + record.workDate + '?'}">
-                            <button type="submit" class="link danger">Xoa</button>
+                              th:attr="data-confirm-message=${'Bạn có chắc muốn xóa chấm công ngày ' + record.workDate + '?'}">
+                            <button type="submit" class="link danger">Xóa</button>
                         </form>
                     </td>
                 </tr>
                 <tr th:if="${records.isEmpty()}">
-                    <td colspan="7" class="empty">Chua co du lieu cham cong</td>
+                    <td colspan="7" class="empty">Chưa có dữ liệu chấm công</td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <div class="table-summary" th:if="${totalElements > 0}">
-            <span th:text="${'Dang hien thi ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' ban ghi'}">Summary</span>
+            <span th:text="${'Đang hiển thị ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' bản ghi'}">Summary</span>
         </div>
     </div>
 
@@ -79,55 +79,58 @@
          th:data-record-id="${editId}"
          th:data-create-url="@{/cms/attendance}"
          th:data-update-template="@{/cms/attendance/__ID__/update}"
-         data-create-title="Them cham cong"
-         data-edit-title="Cap nhat cham cong"
-         data-create-text="Luu"
-         data-edit-text="Cap nhat">
+         data-create-title="Thêm chấm công"
+         data-edit-title="Cập nhật chấm công"
+         data-create-text="Lưu"
+         data-edit-text="Cập nhật">
         <div class="modal">
             <div class="modal-header">
-                <h2 data-modal-title>Quan ly cham cong</h2>
+                <h2 data-modal-title>Quản lý chấm công</h2>
                 <button type="button" class="icon-button" data-close-modal>&times;</button>
             </div>
             <form id="attendanceForm" th:action="@{/cms/attendance}" th:object="${attendanceForm}" method="post">
                 <div class="modal-body grid two-columns">
                     <div class="field">
-                        <label for="employeeId">Nhan vien</label>
+                        <label for="employeeId">Nhân viên</label>
                         <select id="employeeId" th:field="*{employeeId}" data-field="employeeId">
-                            <option value="">-- Chon nhan vien --</option>
+                            <option value="">-- Chọn nhân viên --</option>
                             <option th:each="employee : ${employees}"
                                     th:value="${employee.id}"
-                                    th:text="${employee.fullName}">Employee</option>
+                                    th:text="${employee.fullName}">Nhân viên</option>
                         </select>
-                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="workDate">Ngay lam</label>
+                        <label for="workDate">Ngày làm</label>
                         <input id="workDate" th:field="*{workDate}" data-field="workDate" type="date">
-                        <small th:if="${#fields.hasErrors('workDate')}" th:errors="*{workDate}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('workDate')}" th:errors="*{workDate}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="checkIn">Gio vao</label>
+                        <label for="checkIn">Giờ vào</label>
                         <input id="checkIn" th:field="*{checkIn}" data-field="checkIn" type="time">
                     </div>
                     <div class="field">
-                        <label for="checkOut">Gio ra</label>
+                        <label for="checkOut">Giờ ra</label>
                         <input id="checkOut" th:field="*{checkOut}" data-field="checkOut" type="time">
                     </div>
                     <div class="field">
-                        <label for="workedHours">So gio</label>
+                        <label for="workedHours">Số giờ</label>
                         <input id="workedHours" th:field="*{workedHours}" data-field="workedHours" type="number" step="0.25">
                     </div>
                     <div class="field">
-                        <label for="notes">Ghi chu</label>
+                        <label for="notes">Ghi chú</label>
                         <textarea id="notes" th:field="*{notes}" data-field="notes" rows="2"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="button secondary" data-close-modal>Huy</button>
-                    <button type="submit" class="button" data-modal-submit>Luu</button>
+                    <button type="button" class="button secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="button" data-modal-submit>Lưu</button>
                 </div>
             </form>
         </div>
     </div>
 </section>
 </html>
+
+
+

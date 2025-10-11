@@ -36,8 +36,8 @@ public class LeaveController {
 
     @GetMapping
     public String manageLeave(Model model) {
-        model.addAttribute("pageTitle", "Nghi phep");
-        model.addAttribute("pageHeader", "Quan ly nghi phep");
+        model.addAttribute("pageTitle", "Nghỉ phép");
+        model.addAttribute("pageHeader", "Quản lý nghỉ phép");
         populateModel(model);
         if (!model.containsAttribute("leaveForm")) {
             model.addAttribute("leaveForm", new LeaveRequestPayload());
@@ -56,14 +56,14 @@ public class LeaveController {
         RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", "Nghi phep");
-            model.addAttribute("pageHeader", "Quan ly nghi phep");
+            model.addAttribute("pageTitle", "Nghỉ phép");
+            model.addAttribute("pageHeader", "Quản lý nghỉ phép");
             populateModel(model);
             return "leave/manage";
         }
 
         leaveService.submit(payload);
-        redirectAttributes.addFlashAttribute("successMessage", "Da tao don xin nghi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã tạo đơn xin nghỉ");
         return "redirect:/cms/leave";
     }
 
@@ -77,8 +77,8 @@ public class LeaveController {
         RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", "Nghi phep");
-            model.addAttribute("pageHeader", "Quan ly nghi phep");
+            model.addAttribute("pageTitle", "Nghỉ phép");
+            model.addAttribute("pageHeader", "Quản lý nghỉ phép");
             populateModel(model);
             model.addAttribute("leaveForm", new LeaveRequestPayload());
             model.addAttribute("decisionError", true);
@@ -86,7 +86,7 @@ public class LeaveController {
         }
 
         leaveService.decide(id, decisionRequest);
-        redirectAttributes.addFlashAttribute("successMessage", "Da cap nhat trang thai don nghi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật trạng thái đơn nghỉ");
         return "redirect:/cms/leave";
     }
 
@@ -94,7 +94,7 @@ public class LeaveController {
     @PreAuthorize("hasRole('ADMIN')")
     public String deleteLeave(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         leaveService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Da xoa don nghi");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa đơn nghỉ");
         return "redirect:/cms/leave";
     }
 

@@ -1,50 +1,50 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
 <section th:fragment="content" class="grid two-columns">
     <div class="card">
         <form th:action="@{/cms/payrolls}" th:object="${payrollForm}" method="post" class="form-grid">
             <div class="field">
-                <label for="payrollEmployee">Employee</label>
+                <label for="payrollEmployee">Nhân viên</label>
                 <select id="payrollEmployee" th:field="*{employeeId}">
-                    <option value="">-- Select employee --</option>
+                    <option value="">-- Chọn nhân viên --</option>
                     <option th:each="employee : ${employees}"
                             th:value="${employee.id}"
-                            th:text="${employee.fullName}">Employee</option>
+                            th:text="${employee.fullName}">Nhân viên</option>
                 </select>
-                <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Invalid</small>
+                <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Lỗi</small>
             </div>
             <div class="field">
-                <label for="payrollYear">Year</label>
+                <label for="payrollYear">Năm</label>
                 <input id="payrollYear" th:field="*{payrollYear}" type="number" min="2000" placeholder="2025">
-                <small th:if="${#fields.hasErrors('payrollYear')}" th:errors="*{payrollYear}" class="error-text">Invalid</small>
+                <small th:if="${#fields.hasErrors('payrollYear')}" th:errors="*{payrollYear}" class="error-text">Lỗi</small>
             </div>
             <div class="field">
-                <label for="payrollMonth">Month</label>
+                <label for="payrollMonth">Tháng</label>
                 <input id="payrollMonth" th:field="*{payrollMonth}" type="number" min="1" max="12" placeholder="10">
-                <small th:if="${#fields.hasErrors('payrollMonth')}" th:errors="*{payrollMonth}" class="error-text">Invalid</small>
+                <small th:if="${#fields.hasErrors('payrollMonth')}" th:errors="*{payrollMonth}" class="error-text">Lỗi</small>
             </div>
             <div class="field">
-                <label for="baseSalary">Base salary</label>
-                <input id="baseSalary" th:field="*{baseSalary}" type="number" step="0.01">
+                <label for="baseSalary">Lương cơ bản</label>
+                <input id="baseSalary" th:field="*{baseSalary}" type="number" step="0.01" placeholder="15000000">
             </div>
             <div class="field">
-                <label for="overtimeHours">Overtime hours</label>
+                <label for="overtimeHours">Số giờ tăng ca</label>
                 <input id="overtimeHours" th:field="*{overtimeHours}" type="number" step="0.25">
             </div>
             <div class="field">
-                <label for="overtimeAmount">Overtime amount</label>
+                <label for="overtimeAmount">Tiền tăng ca</label>
                 <input id="overtimeAmount" th:field="*{overtimeAmount}" type="number" step="0.01">
             </div>
             <div class="field">
-                <label for="bonus">Bonus</label>
+                <label for="bonus">Thưởng</label>
                 <input id="bonus" th:field="*{bonus}" type="number" step="0.01">
             </div>
             <div class="field">
-                <label for="deductions">Deductions</label>
+                <label for="deductions">Khấu trừ</label>
                 <input id="deductions" th:field="*{deductions}" type="number" step="0.01">
             </div>
             <div class="actions">
-                <button type="submit">Generate payroll</button>
+                <button type="submit">Tính bảng lương</button>
             </div>
         </form>
     </div>
@@ -52,29 +52,29 @@
     <div class="card">
         <form class="filters" method="get" th:action="@{/cms/payrolls}">
             <select name="employeeId">
-                <option value="">-- All employees --</option>
+                <option value="">-- Tất cả nhân viên --</option>
                 <option th:each="employee : ${employees}"
                         th:value="${employee.id}"
                         th:selected="${employee.id == selectedEmployeeId}"
-                        th:text="${employee.fullName}">Employee</option>
+                        th:text="${employee.fullName}">Nhân viên</option>
             </select>
-            <button type="submit">Filter</button>
+            <button type="submit">Lọc</button>
         </form>
         <table class="data-table">
             <thead>
             <tr>
-                <th>Employee</th>
-                <th>Period</th>
-                <th>Base</th>
-                <th>Overtime</th>
-                <th>Bonus</th>
-                <th>Deductions</th>
-                <th>Net pay</th>
+                <th>Nhân viên</th>
+                <th>Kỳ lương</th>
+                <th>Lương cơ bản</th>
+                <th>Tăng ca</th>
+                <th>Thưởng</th>
+                <th>Khấu trừ</th>
+                <th>Thực lĩnh</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="payroll : ${payrolls}">
-                <td th:text="${#lists.find(employees, e -> e.id == payroll.employeeId)?.fullName}">Employee</td>
+                <td th:text="${#lists.find(employees, e -> e.id == payroll.employeeId)?.fullName}">Nhân viên</td>
                 <td th:text="${payroll.payrollMonth + '/' + payroll.payrollYear}">10/2025</td>
                 <td th:text="${#numbers.formatDecimal(payroll.baseSalary, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
                 <td>
@@ -86,10 +86,12 @@
                 <td class="highlight" th:text="${#numbers.formatDecimal(payroll.netPay, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
             </tr>
             <tr th:if="${payrolls.isEmpty()}">
-                <td colspan="7" class="empty">No payroll entries</td>
+                <td colspan="7" class="empty">Chưa có dữ liệu bảng lương</td>
             </tr>
             </tbody>
         </table>
     </div>
 </section>
 </html>
+
+

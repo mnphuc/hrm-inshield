@@ -5,13 +5,13 @@
         <div class="table-actions">
             <div>
                 <button type="button" class="button" data-open-modal="expenseModal" data-mode="create">
-                    + Them chi phi
+                    + Thêm chi phí
                 </button>
             </div>
             <div class="pagination" th:if="${totalPages > 1}">
                 <a class="page-link"
                    th:classappend="${currentPage == 0}? 'disabled'"
-                   th:href="${currentPage == 0}? '#': @{/cms/expenses(page=${currentPage - 1}, size=${pageSize})}">Prev</a>
+                   th:href="${currentPage == 0}? '#': @{/cms/expenses(page=${currentPage - 1}, size=${pageSize})}">Trang trước</a>
                 <a class="page-link"
                    th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
                    th:text="${pageNum + 1}"
@@ -19,26 +19,26 @@
                    th:classappend="${pageNum == currentPage}? 'active'">1</a>
                 <a class="page-link"
                    th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
-                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/expenses(page=${currentPage + 1}, size=${pageSize})}">Next</a>
+                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/expenses(page=${currentPage + 1}, size=${pageSize})}">Trang sau</a>
             </div>
         </div>
         <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                 <tr>
-                    <th>Nhan vien</th>
-                    <th>Du an</th>
-                    <th>Danh muc</th>
-                    <th>So tien</th>
-                    <th>Ngay</th>
-                    <th>Trang thai</th>
+                    <th>Nhân viên</th>
+                    <th>Dự án</th>
+                    <th>Danh mục</th>
+                    <th>Số tiền</th>
+                    <th>Ngày</th>
+                    <th>Trạng thái</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="expense : ${expenses}">
-                    <td th:text="${#lists.find(employees, e -> e.id == expense.employeeId)?.fullName}">Employee</td>
-                    <td th:text="${#lists.find(projects, p -> p.id == expense.projectId)?.name}">Project</td>
+                    <td th:text="${#lists.find(employees, e -> e.id == expense.employeeId)?.fullName}">Nhân viên</td>
+                    <td th:text="${#lists.find(projects, p -> p.id == expense.projectId)?.name}">Dự án</td>
                     <td th:text="${expense.category}">Category</td>
                     <td th:text="${#numbers.formatDecimal(expense.amount, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
                     <td th:text="${expense.incurredDate}">2024-01-01</td>
@@ -52,28 +52,28 @@
                                          data-value-amount=${expense.amount},
                                          data-value-incurred-date=${expense.incurredDate},
                                          data-value-description=${expense.description}">
-                            Chinh sua
+                            Chỉnh sửa
                         </button>
                         <button type="button" class="button-link" data-open-modal="expenseStatusModal" data-mode="edit"
                                 th:attr="data-record-id=${expense.id},
                                          data-value-status=${expense.status},
                                          data-value-expense-name=${expense.category}">
-                            Cap nhat trang thai
+                            Cập nhật trạng thái
                         </button>
                         <form th:action="@{/cms/expenses/{id}/delete(id=${expense.id})}" method="post"
-                              th:attr="data-confirm-message=${'Ban co muon xoa chi phi ' + expense.category + '?'}">
-                            <button type="submit" class="link danger">Xoa</button>
+                              th:attr="data-confirm-message=${'Bạn có muốn xóa chi phí ' + expense.category + '?'}">
+                            <button type="submit" class="link danger">Xóa</button>
                         </form>
                     </td>
                 </tr>
                 <tr th:if="${expenses.isEmpty()}">
-                    <td colspan="7" class="empty">Chua co chi phi nao</td>
+                    <td colspan="7" class="empty">Chưa có chi phí nào</td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <div class="table-summary" th:if="${totalElements > 0}">
-            <span th:text="${'Dang hien thi ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' chi phi'}">Summary</span>
+            <span th:text="${'Đang hiển thị ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' Chi phí'}">Tổng quan</span>
         </div>
     </div>
 
@@ -85,59 +85,59 @@
          th:data-record-id="${expenseEditId}"
          th:data-create-url="@{/cms/expenses}"
          th:data-update-template="@{/cms/expenses/__ID__/update}"
-         data-create-title="Them chi phi"
-         data-edit-title="Cap nhat chi phi"
-         data-create-text="Luu"
-         data-edit-text="Cap nhat">
+         data-create-title="Thêm chi phí"
+         data-edit-title="Cập nhật chi phí"
+         data-create-text="Lưu"
+         data-edit-text="Cập nhật">
         <div class="modal">
             <div class="modal-header">
-                <h2 data-modal-title>Quan ly chi phi</h2>
+                <h2 data-modal-title>Quản lý chi phí</h2>
                 <button type="button" class="icon-button" data-close-modal>&times;</button>
             </div>
             <form id="expenseForm" th:action="@{/cms/expenses}" th:object="${expenseForm}" method="post">
                 <div class="modal-body grid two-columns">
                     <div class="field">
-                        <label for="expenseEmployee">Nhan vien</label>
+                        <label for="expenseEmployee">Nhân viên</label>
                         <select id="expenseEmployee" th:field="*{employeeId}" data-field="employeeId">
-                            <option value="">-- Chon nhan vien --</option>
+                            <option value="">-- Chọn nhân viên --</option>
                             <option th:each="employee : ${employees}"
                                     th:value="${employee.id}"
-                                    th:text="${employee.fullName}">Employee</option>
+                                    th:text="${employee.fullName}">Nhân viên</option>
                         </select>
-                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('employeeId')}" th:errors="*{employeeId}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="expenseProject">Du an</label>
+                        <label for="expenseProject">Dự án</label>
                         <select id="expenseProject" th:field="*{projectId}" data-field="projectId">
-                            <option value="">-- Khong lien ket --</option>
+                            <option value="">-- Không liên kết --</option>
                             <option th:each="project : ${projects}"
                                     th:value="${project.id}"
-                                    th:text="${project.name}">Project</option>
+                                    th:text="${project.name}">Dự án</option>
                         </select>
                     </div>
                     <div class="field">
-                        <label for="category">Danh muc</label>
+                        <label for="category">Danh mục</label>
                         <input id="category" th:field="*{category}" data-field="category" type="text" placeholder="Cong tac">
-                        <small th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="amount">So tien</label>
+                        <label for="amount">Số tiền</label>
                         <input id="amount" th:field="*{amount}" data-field="amount" type="number" step="0.01">
-                        <small th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="incurredDate">Ngay phat sinh</label>
+                        <label for="incurredDate">Ngày phát sinh</label>
                         <input id="incurredDate" th:field="*{incurredDate}" data-field="incurredDate" type="date">
-                        <small th:if="${#fields.hasErrors('incurredDate')}" th:errors="*{incurredDate}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('incurredDate')}" th:errors="*{incurredDate}" class="error-text">Lỗi</small>
                     </div>
                     <div class="field">
-                        <label for="description">Mo ta</label>
+                        <label for="description">Mô tả</label>
                         <textarea id="description" th:field="*{description}" data-field="description" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="button secondary" data-close-modal>Huy</button>
-                    <button type="submit" class="button" data-modal-submit>Luu</button>
+                    <button type="button" class="button secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="button" data-modal-submit>Lưu</button>
                 </div>
             </form>
         </div>
@@ -150,32 +150,36 @@
          th:data-mode="'edit'"
          th:data-record-id="${statusExpenseId}"
          th:data-update-template="@{/cms/expenses/__ID__/status}"
-         data-edit-title="Cap nhat trang thai"
-         data-edit-text="Cap nhat">
+         data-edit-title="Cập nhật trạng thái"
+         data-edit-text="Cập nhật">
         <div class="modal">
             <div class="modal-header">
-                <h2 data-modal-title>Cap nhat trang thai</h2>
+                <h2 data-modal-title>Cập nhật trạng thái</h2>
                 <button type="button" class="icon-button" data-close-modal>&times;</button>
             </div>
             <form id="statusForm" th:action="@{/cms/expenses}" th:object="${statusForm}" method="post">
                 <div class="modal-body">
                     <div class="field">
-                        <label for="statusSelect">Trang thai</label>
+                        <label for="statusSelect">Trạng thái</label>
                         <select id="statusSelect" th:field="*{status}" data-field="status">
-                            <option value="">-- Chon trang thai --</option>
+                            <option value="">-- Chọn trạng thái --</option>
                             <option th:each="status : ${expenseStatuses}"
                                     th:value="${status}"
                                     th:text="${status}">STATUS</option>
                         </select>
-                        <small th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="error-text">Error</small>
+                        <small th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="error-text">Lỗi</small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="button secondary" data-close-modal>Huy</button>
-                    <button type="submit" class="button" data-modal-submit>Cap nhat</button>
+                    <button type="button" class="button secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="button" data-modal-submit>Cập nhật</button>
                 </div>
             </form>
         </div>
     </div>
 </section>
 </html>
+
+
+
+

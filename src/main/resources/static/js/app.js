@@ -151,7 +151,7 @@
     function initialiseConfirms() {
         document.querySelectorAll('form[data-confirm-message]').forEach((form) => {
             form.addEventListener('submit', (event) => {
-                const message = form.dataset.confirmMessage || 'Are you sure?';
+                const message = form.dataset.confirmMessage || 'Ban co chac chan?';
                 if (!window.confirm(message)) {
                     event.preventDefault();
                 }
@@ -164,3 +164,4 @@
         initialiseConfirms();
     });
 })();
+

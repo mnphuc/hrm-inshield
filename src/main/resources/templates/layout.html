@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'TechShield CMS - ' + (${pageTitle} ?: 'Dashboard')">TechShield CMS</title>
+    <title th:text="'TechShield CMS - ' + (${pageTitle} ?: 'Bảng điều khiển')">TechShield CMS</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
     <script th:src="@{/js/app.js}" defer></script>
 </head>
@@ -16,36 +16,36 @@
         </div>
         <nav class="nav">
             <a th:href="@{/dashboard}"
-               th:classappend="${currentPath != null and currentPath == '/dashboard'} ? 'active' : ''">Dashboard</a>
+               th:classappend="${currentPath != null and currentPath == '/dashboard'} ? 'active' : ''">Bảng điều khiển</a>
             <a th:href="@{/cms/employees}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/employees')} ? 'active' : ''">Employees</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/employees')} ? 'active' : ''">Nhân viên</a>
             <a th:href="@{/cms/attendance}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/attendance')} ? 'active' : ''">Attendance</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/attendance')} ? 'active' : ''">Chấm công</a>
             <a th:href="@{/cms/projects}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/projects')} ? 'active' : ''">Projects</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/projects')} ? 'active' : ''">Dự án</a>
             <a th:href="@{/cms/expenses}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/expenses')} ? 'active' : ''">Expenses</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/expenses')} ? 'active' : ''">Chi phí</a>
             <a th:href="@{/cms/leave}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/leave')} ? 'active' : ''">Leave</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/leave')} ? 'active' : ''">Nghỉ phép</a>
             <a th:href="@{/cms/payrolls}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/payrolls')} ? 'active' : ''">Payroll</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/payrolls')} ? 'active' : ''">Bảng lương</a>
             <a th:href="@{/auth/register}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/auth')} ? 'active' : ''">Users</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/auth')} ? 'active' : ''">Tài khoản</a>
         </nav>
         <form th:action="@{/logout}" method="post" class="logout-form">
-            <button type="submit">Logout</button>
+            <button type="submit">Đăng xuất</button>
         </form>
     </aside>
     <main class="main">
         <header class="page-heading">
             <div>
-                <h1 th:text="${pageHeader} ?: 'Dashboard'">Dashboard</h1>
-                <p class="breadcrumb" th:text="${pageTitle} ?: 'Overview'">Overview</p>
+                <h1 th:text="${pageHeader} ?: 'Bảng điều khiển'">Bảng điều khiển</h1>
+                <p class="breadcrumb" th:text="${pageTitle} ?: 'Tổng quan'">Tổng quan</p>
             </div>
         </header>
         <section class="alerts">
-            <div th:if="${successMessage}" class="alert success" th:text="${successMessage}">Success</div>
-            <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}">Error</div>
+            <div th:if="${successMessage}" class="alert success" th:text="${successMessage}">Thành công</div>
+            <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}">Lỗi</div>
         </section>
         <section class="page-content" th:insert="${content}">
             <p>Content placeholder</p>
@@ -54,3 +54,7 @@
 </div>
 </body>
 </html>
+
+
+
+
