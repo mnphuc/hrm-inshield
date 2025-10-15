@@ -3,24 +3,31 @@
 <section th:fragment="content">
     <div class="card">
         <form th:action="@{/auth/register}" th:object="${registerForm}" method="post" class="form-grid">
-            <div th:if="${#fields.hasGlobalErrors()}" class="alert error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">Lỗi</div>
+<!--            <div th:if="${#fields.hasGlobalErrors()}" class="alert error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">Lỗi</div>-->
+            <div th:if="${successMessage}" class="alert success" th:text="${successMessage}"></div>
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert error">
+                <ul>
+                    <li th:each="err : ${#fields.globalErrors()}" th:text="${err}">Lỗi</li>
+                </ul>
+            </div>
+
 
             <div class="field">
                 <label for="username">Tên đăng nhập</label>
                 <input id="username" th:field="*{username}" type="text" placeholder="techshield.admin">
-                <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-text">Không hợp lệ</small>
+                <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-text"></small>
             </div>
 
             <div class="field">
                 <label for="email">Email</label>
                 <input id="email" th:field="*{email}" type="email" placeholder="admin@techshield.vn">
-                <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text">Không hợp lệ</small>
+                <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text"></small>
             </div>
 
             <div class="field">
                 <label for="password">Mật khẩu</label>
                 <input id="password" th:field="*{password}" type="password" placeholder="********">
-                <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-text">Không hợp lệ</small>
+                <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-text"></small>
             </div>
 
             <div class="field">
@@ -31,7 +38,7 @@
             <div class="field">
                 <label for="fullName">Họ và tên</label>
                 <input id="fullName" th:field="*{fullName}" type="text" placeholder="Nguyễn Văn A">
-                <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error-text">Không hợp lệ</small>
+                <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error-text"></small>
             </div>
 
             <div class="field">

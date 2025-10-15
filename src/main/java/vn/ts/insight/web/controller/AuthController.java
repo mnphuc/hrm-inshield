@@ -51,7 +51,14 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("successMessage", "Đã tạo tài khoản thành công");
             return "redirect:/auth/register";
         } catch (IllegalArgumentException ex) {
-            bindingResult.reject("registerError", ex.getMessage());
+            String message = ex.getMessage();
+            if (message.contains("Username")) {
+                bindingResult.rejectValue("username", "error.username", message);
+            } else if (message.contains("Email")) {
+                bindingResult.rejectValue("email", "error.email", message);
+            } else {
+                bindingResult.reject("registerError", message); // global error
+            }
             prepareModel(model);
             return "auth/register";
         }

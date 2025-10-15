@@ -2,6 +2,9 @@ package vn.ts.insight.web.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,6 +62,7 @@ public class LeaveController {
             model.addAttribute("pageTitle", "Nghỉ phép");
             model.addAttribute("pageHeader", "Quản lý nghỉ phép");
             populateModel(model);
+            model.addAttribute("decisionForm", new LeaveDecisionRequest());
             return "leave/manage";
         }
 
@@ -102,6 +106,9 @@ public class LeaveController {
         List<LeaveResponse> leaveRequests = leaveService.findAll();
         List<LeaveResponse> pendingRequests = leaveService.findPending();
         List<EmployeeResponse> employees = employeeService.findAll();
+        Map<Long, String> employeeNames = employees.stream()
+                .collect(Collectors.toMap(EmployeeResponse::getId, EmployeeResponse::getFullName));
+        model.addAttribute("employeeNames", employeeNames);
         model.addAttribute("leaveRequests", leaveRequests);
         model.addAttribute("pendingRequests", pendingRequests);
         model.addAttribute("employees", employees);

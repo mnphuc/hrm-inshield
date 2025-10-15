@@ -266,7 +266,16 @@ button:hover, .button:hover, .button-link:hover {
     gap: 8px;
     align-items: center;
 }
+/*.actions-cell {*/
+/*    white-space: nowrap;*/
+/*}*/
 
+/*.actions-cell form {*/
+/*    display: inline-flex;*/
+/*    gap: 8px;*/
+/*    align-items: center;*/
+/*    margin-right: 8px;*/
+/*}*/
 .empty {
     text-align: center;
     color: var(--muted);
@@ -476,4 +485,23 @@ button:hover, .button:hover, .button-link:hover {
     .modal-body {
         grid-template-columns: 1fr !important;
     }
+}
+.alert.error {
+    color: #fff;
+    background-color: #e74c3c;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.error-text {
+    color: #e74c3c;
+    font-size: 0.9em;
+}
+.alert.success {
+    color: #fff;
+    background-color: #2ecc71; /* màu xanh */
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
 }

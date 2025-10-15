@@ -2,6 +2,9 @@ package vn.ts.insight.web.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -144,11 +147,21 @@ public class ExpenseController {
 
     private void populateModel(Model model, int page, int size) {
         var expensePage = expenseService.findPage(page, size);
+        int start = page * size + 1;
+        int end = Math.min((page + 1) * size, (int) expensePage.getTotalElements());
+        model.addAttribute("startRecord", start);
+        model.addAttribute("endRecord", end);
         List<EmployeeResponse> employees = employeeService.findAll();
         List<ProjectResponse> projects = projectService.findAll();
+        Map<Long, String> employeeNames = employees.stream()
+                .collect(Collectors.toMap(EmployeeResponse::getId, EmployeeResponse::getFullName));
+        Map<Long, String> projectNames = projects.stream()
+                .collect(Collectors.toMap(ProjectResponse::getId, ProjectResponse::getName));
         model.addAttribute("expenses", expensePage.getContent());
         model.addAttribute("employees", employees);
         model.addAttribute("projects", projects);
+        model.addAttribute("employeeNames", employeeNames);
+        model.addAttribute("projectNames", projectNames);
         model.addAttribute("expenseStatuses", ExpenseStatus.values());
         model.addAttribute("currentPage", expensePage.getNumber());
         model.addAttribute("pageSize", expensePage.getSize());

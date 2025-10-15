@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
-<section th:fragment="content" class="grid two-columns">
+<section th:fragment="content" class="grid two-columns" >
     <div class="card">
         <form th:action="@{/cms/leave}" th:object="${leaveForm}" method="post" class="form-grid">
             <div class="field">
@@ -48,7 +48,7 @@
         </form>
     </div>
 
-    <div class="card">
+    <div class="card " style="grid-column: span 2">
         <h2>Chờ duyệt</h2>
         <table class="data-table">
             <thead>
@@ -62,16 +62,16 @@
             </thead>
             <tbody>
             <tr th:each="leave : ${pendingRequests}">
-                <td th:text="${#lists.find(employees, e -> e.id == leave.employeeId)?.fullName}">Nhân viên</td>
+                <td th:text="${employeeNames[leave.employeeId]} ?: '—'">Nhân viên</td>
                 <td th:text="${leave.type}">ANNUAL</td>
                 <td>
                     <span th:text="${leave.startDate}">2024-01-01</span>
                     <span> - </span>
                     <span th:text="${leave.endDate}">2024-01-05</span>
-                    <span th:text="' (' + leave.totalDays + ' ngày)'"></span>
-                </td>
+                    <span th:text="'(' + ${leave.totalDays} + ' ngày)'"></span>                </td>
                 <td th:text="${leave.status}">PENDING</td>
                 <td class="actions-cell">
+                    <div>
                     <form th:action="@{/cms/leave/{id}/decision(id=${leave.id})}" method="post" th:object="${decisionForm}">
                         <select th:field="*{status}" th:id="'leave-status-' + ${leave.id}">
                             <option th:each="status : ${leaveStatuses}"
@@ -90,6 +90,7 @@
                     <form th:action="@{/cms/leave/{id}/delete(id=${leave.id})}" method="post">
                         <button type="submit" class="link danger" onclick="return confirm('Bạn có muốn xóa đơn nghỉ?');">Xóa</button>
                     </form>
+                    </div>
                 </td>
             </tr>
             <tr th:if="${pendingRequests.isEmpty()}">
@@ -113,16 +114,16 @@
             </thead>
             <tbody>
             <tr th:each="leave : ${leaveRequests}">
-                <td th:text="${#lists.find(employees, e -> e.id == leave.employeeId)?.fullName}">Nhân viên</td>
+                <td th:text="${employeeNames[leave.employeeId]} ?: '—'">Nhân viên</td>
                 <td th:text="${leave.type}">ANNUAL</td>
                 <td>
                     <span th:text="${leave.startDate}">2024-01-01</span>
                     <span> - </span>
                     <span th:text="${leave.endDate}">2024-01-05</span>
-                    <span th:text="' (' + leave.totalDays + ' ngày)'"></span>
+                    <span th:text="'(' + ${leave.totalDays} + ' ngày)'"></span>
                 </td>
                 <td th:text="${leave.status}">APPROVED</td>
-                <td th:text="${#lists.find(employees, e -> e.id == leave.approverId)?.fullName}">Người duyệt</td>
+                <td th:text="${leave.approverId != null ? employeeNames[leave.approverId] : '—'}">—</td>
             </tr>
             <tr th:if="${leaveRequests.isEmpty()}">
                 <td colspan="5" class="empty">Chưa có đơn nghỉ phép</td>

@@ -61,6 +61,10 @@ public class AuthService {
 
         Employee employee = null;
         if (request.getFullName() != null && !request.getFullName().isBlank()) {
+
+            if (userAccountRepository.existsByEmail(request.getEmail())) {
+                throw new IllegalArgumentException("Email already exists");
+            }
             employee = new Employee();
             employee.setCode(resolveEmployeeCode(request, account));
             employee.setFullName(request.getFullName());

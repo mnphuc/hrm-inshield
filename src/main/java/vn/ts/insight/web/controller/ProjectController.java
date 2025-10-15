@@ -142,6 +142,10 @@ public class ProjectController {
 
     private void populateModel(Model model, int page, int size) {
         var projectPage = projectService.findPage(page, size);
+        int start = page * size + 1;
+        int end = Math.min((page + 1) * size, (int) projectPage.getTotalElements());
+        model.addAttribute("startRecord", start);
+        model.addAttribute("endRecord", end);
         List<ProjectResponse> projects = projectPage.getContent();
         Map<Long, List<ProjectAssignmentResponse>> assignmentMap = projects.stream()
             .collect(Collectors.toMap(
@@ -149,10 +153,15 @@ public class ProjectController {
                 project -> projectService.findAssignmentsByProject(project.getId())
             ));
         List<EmployeeResponse> employees = employeeService.findAll();
-
+        Map<Long, String> managerNames = employees.stream()
+                .collect(Collectors.toMap(EmployeeResponse::getId, EmployeeResponse::getFullName));
+        Map<Long, String> employeeNames = employees.stream()
+                .collect(Collectors.toMap(EmployeeResponse::getId, EmployeeResponse::getFullName));
         model.addAttribute("projects", projects);
         model.addAttribute("assignmentMap", assignmentMap);
         model.addAttribute("employees", employees);
+        model.addAttribute("employeeNames", employeeNames);
+        model.addAttribute("managerNames", managerNames);
         model.addAttribute("projectStatuses", ProjectStatus.values());
         model.addAttribute("currentPage", projectPage.getNumber());
         model.addAttribute("pageSize", projectPage.getSize());

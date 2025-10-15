@@ -46,6 +46,7 @@
                     <td class="actions-cell">
                         <button type="button" class="button-link" data-open-modal="employeeModal" data-mode="edit"
                                 th:attr="data-record-id=${employee.id},
+                                         data-update-url=@{/cms/employees/{id}/update(id=${employee.id})},
                                          data-value-code=${employee.code},
                                          data-value-full-name=${employee.fullName},
                                          data-value-email=${employee.email},
@@ -73,8 +74,12 @@
             </table>
         </div>
         <div class="table-summary" th:if="${totalElements > 0}">
-            <span th:text="${'Đang hiển thị ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' Nhân viên'}">Tổng quan</span>
+    <span th:text="|Đang hiển thị ${startIndex} - ${endIndex} / ${totalElements} Nhân viên|">
+        Tổng quan
+    </span>
         </div>
+
+
     </div>
 
     <div class="modal-backdrop"
@@ -84,7 +89,6 @@
          th:data-mode="${modalMode}"
          th:data-record-id="${editId}"
          th:data-create-url="@{/cms/employees}"
-         th:data-update-template="@{/cms/employees/__ID__/update}"
          data-create-title="Thêm nhân viên"
          data-edit-title="Cập nhật nhân viên"
          data-create-text="Lưu"

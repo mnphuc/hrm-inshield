@@ -47,10 +47,17 @@
 
     function deriveAction(mode, modal, dataset) {
         const createUrl = modal.dataset.createUrl;
-        const updateTemplate = modal.dataset.updateTemplate;
-        if (mode === 'edit' && dataset && dataset.recordId && updateTemplate) {
-            return updateTemplate.replace('__ID__', dataset.recordId);
+        if (mode === 'edit' && dataset) {
+            if (dataset.updateUrl) {
+                return dataset.updateUrl;
+            }
+
+            const updateTemplate = modal.dataset.updateTemplate;
+            if (updateTemplate && dataset.recordId) {
+                return updateTemplate.replace('__ID__', dataset.recordId);
+            }
         }
+
         return createUrl || '';
     }
 

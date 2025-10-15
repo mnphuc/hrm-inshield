@@ -37,7 +37,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="record : ${records}">
-                    <td th:text="${#lists.find(employees, e -> e.id == record.employeeId)?.fullName}">Nhân viên</td>
+                    <td th:text="${employeeNameMap[record.employeeId]}">Nhân viên</td>
                     <td th:text="${record.workDate}">2024-01-01</td>
                     <td th:text="${record.checkIn}">08:00</td>
                     <td th:text="${record.checkOut}">17:00</td>
@@ -46,6 +46,7 @@
                     <td class="actions-cell">
                         <button type="button" class="button-link" data-open-modal="attendanceModal" data-mode="edit"
                                 th:attr="data-record-id=${record.id},
+                                         data-update-url=@{/cms/attendance/{id}/update(id=${record.id})},
                                          data-value-employee-id=${record.employeeId},
                                          data-value-work-date=${record.workDate},
                                          data-value-check-in=${record.checkIn},
@@ -67,7 +68,7 @@
             </table>
         </div>
         <div class="table-summary" th:if="${totalElements > 0}">
-            <span th:text="${'Đang hiển thị ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' bản ghi'}">Summary</span>
+            <p th:text="'Đang hiển thị ' + ${startRecord} + ' - ' + ${endRecord} + ' / ' + ${totalElements} + ' bản ghi'"></p>
         </div>
     </div>
 
@@ -78,7 +79,6 @@
          th:data-mode="${modalMode}"
          th:data-record-id="${editId}"
          th:data-create-url="@{/cms/attendance}"
-         th:data-update-template="@{/cms/attendance/__ID__/update}"
          data-create-title="Thêm chấm công"
          data-edit-title="Cập nhật chấm công"
          data-create-text="Lưu"

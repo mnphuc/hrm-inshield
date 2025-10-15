@@ -37,8 +37,8 @@
                 </thead>
                 <tbody>
                 <tr th:each="expense : ${expenses}">
-                    <td th:text="${#lists.find(employees, e -> e.id == expense.employeeId)?.fullName}">Nhân viên</td>
-                    <td th:text="${#lists.find(projects, p -> p.id == expense.projectId)?.name}">Dự án</td>
+                    <td th:text="${expense.employeeId != null ? employeeNames[expense.employeeId] : '—'}">Nhân viên</td>
+                    <td th:text="${expense.projectId != null ? projectNames[expense.projectId] : '—'}">Dự án</td>
                     <td th:text="${expense.category}">Category</td>
                     <td th:text="${#numbers.formatDecimal(expense.amount, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>
                     <td th:text="${expense.incurredDate}">2024-01-01</td>
@@ -47,6 +47,7 @@
                         <button type="button" class="button-link" data-open-modal="expenseModal" data-mode="edit"
                                 th:attr="data-record-id=${expense.id},
                                          data-value-employee-id=${expense.employeeId},
+                                         data-update-url=@{/cms/expenses/{id}/update(id=${expense.id})},
                                          data-value-project-id=${expense.projectId},
                                          data-value-category=${expense.category},
                                          data-value-amount=${expense.amount},
@@ -56,6 +57,7 @@
                         </button>
                         <button type="button" class="button-link" data-open-modal="expenseStatusModal" data-mode="edit"
                                 th:attr="data-record-id=${expense.id},
+                                         data-update-url=@{/cms/expenses/{id}/status(id=${expense.id})},
                                          data-value-status=${expense.status},
                                          data-value-expense-name=${expense.category}">
                             Cập nhật trạng thái
@@ -73,7 +75,7 @@
             </table>
         </div>
         <div class="table-summary" th:if="${totalElements > 0}">
-            <span th:text="${'Đang hiển thị ' + (currentPage * pageSize + 1) + ' - ' + T(java.lang.Math).min((currentPage + 1) * pageSize, totalElements) + ' / ' + totalElements + ' Chi phí'}">Tổng quan</span>
+            <p th:text="'Đang hiển thị ' + ${startRecord} + ' - ' + ${endRecord} + ' / ' + ${totalElements} + ' bản ghi'"></p>
         </div>
     </div>
 
@@ -84,7 +86,6 @@
          th:data-mode="${expenseModalMode}"
          th:data-record-id="${expenseEditId}"
          th:data-create-url="@{/cms/expenses}"
-         th:data-update-template="@{/cms/expenses/__ID__/update}"
          data-create-title="Thêm chi phí"
          data-edit-title="Cập nhật chi phí"
          data-create-text="Lưu"
@@ -149,7 +150,6 @@
          th:data-open="${showStatusModal} ? 'true' : 'false'"
          th:data-mode="'edit'"
          th:data-record-id="${statusExpenseId}"
-         th:data-update-template="@{/cms/expenses/__ID__/status}"
          data-edit-title="Cập nhật trạng thái"
          data-edit-text="Cập nhật">
         <div class="modal">
