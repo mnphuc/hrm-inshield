@@ -2,6 +2,9 @@ package vn.ts.insight.web.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -71,6 +74,9 @@ public class PayrollController {
         List<PayrollResponse> payrolls = (employeeId != null)
             ? payrollService.findByEmployee(employeeId)
             : payrollService.findAll();
+        Map<Long, String> employeeNames = employees.stream()
+                .collect(Collectors.toMap(EmployeeResponse::getId, EmployeeResponse::getFullName));
+        model.addAttribute("employeeNames", employeeNames);
         model.addAttribute("employees", employees);
         model.addAttribute("payrolls", payrolls);
     }

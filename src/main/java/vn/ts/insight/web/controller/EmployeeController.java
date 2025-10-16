@@ -35,6 +35,13 @@ public class EmployeeController {
         Model model
     ) {
         populateModel(model, page, size);
+        Long totalElements = (Long) model.getAttribute("totalElements"); // hoặc lấy từ Page<Employee>
+        int startIndex = page * size + 1;
+        int endIndex = (int) Math.min((page + 1) * size, totalElements);
+
+        model.addAttribute("startIndex", startIndex);
+        model.addAttribute("endIndex", endIndex);
+
         if (!model.containsAttribute("employeeForm")) {
             model.addAttribute("employeeForm", new EmployeeRequest());
         }

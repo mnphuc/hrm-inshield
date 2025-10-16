@@ -2,6 +2,9 @@ package vn.ts.insight.web.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -104,7 +107,15 @@ public class AttendanceController {
 
     private void populateModel(Model model, int page, int size) {
         var recordPage = attendanceService.findPage(page, size);
+        int start = page * size + 1;
+        int end = Math.min((page + 1) * size, (int) recordPage.getTotalElements());
+        model.addAttribute("startRecord", start);
+        model.addAttribute("endRecord", end);
         List<EmployeeResponse> employees = employeeService.findAll();
+        Map<Long, String> employeeNameMap = employees.stream()
+                .collect(Collectors.toMap(EmployeeResponse::getId, EmployeeResponse::getFullName));
+        model.addAttribute("employeeNameMap", employeeNameMap);
+        model.addAttribute("employees", employees);
         model.addAttribute("records", recordPage.getContent());
         model.addAttribute("employees", employees);
         model.addAttribute("currentPage", recordPage.getNumber());
