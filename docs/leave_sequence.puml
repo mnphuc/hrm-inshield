@@ -1,0 +1,47 @@
+@startuml
+actor "Người dùng (Admin / HR / Manager / Employee)" as User
+participant "Giao diện Nghỉ phép" as View
+participant "LeaveController" as Controller
+participant "LeaveService" as Service
+participant "Cơ sở dữ liệu (Database)" as DB
+
+== Xem danh sách đơn nghỉ ==
+User -> View: Mở trang "Quản lý Nghỉ phép"
+View -> Controller: Gửi yêu cầu tải dữ liệu trang nghỉ phép
+Controller -> Service: Lấy danh sách đơn nghỉ và danh sách nhân viên
+Service -> DB: Truy vấn dữ liệu từ bảng nghỉ phép và nhân viên
+DB --> Service: Trả về danh sách dữ liệu
+Service --> Controller: Trả dữ liệu đã xử lý
+Controller -> View: Đưa dữ liệu vào model để hiển thị
+User <- View: Thấy danh sách đơn nghỉ trên giao diện
+
+== Gửi đơn nghỉ mới ==
+User -> View: Nhập thông tin đơn nghỉ và nhấn "Gửi đơn"
+View -> Controller: Gửi yêu cầu tạo mới đơn nghỉ
+Controller -> Service: Yêu cầu lưu thông tin đơn nghỉ
+Service -> DB: Kiểm tra nhân viên hợp lệ, lưu đơn nghỉ mới vào cơ sở dữ liệu
+DB --> Service: Xác nhận lưu thành công
+Service --> Controller: Trả kết quả lưu thành công
+Controller -> View: Hiển thị thông báo “Đã tạo đơn xin nghỉ”
+User <- View: Thấy đơn nghỉ mới xuất hiện trong danh sách
+
+== Cập nhật trạng thái đơn nghỉ ==
+User -> View: Chọn người duyệt và trạng thái (Duyệt / Từ chối)
+View -> Controller: Gửi yêu cầu cập nhật trạng thái đơn nghỉ
+Controller -> Service: Gửi yêu cầu cập nhật trạng thái trong hệ thống
+Service -> DB: Tìm đơn nghỉ, xác nhận người duyệt, cập nhật trạng thái và thời gian duyệt
+DB --> Service: Xác nhận cập nhật thành công
+Service --> Controller: Thông báo cập nhật hoàn tất
+Controller -> View: Hiển thị “Đã cập nhật trạng thái đơn nghỉ”
+User <- View: Thấy trạng thái đơn nghỉ thay đổi trên bảng
+
+== Xóa đơn nghỉ ==
+User -> View: Chọn “Xóa” trên một đơn nghỉ
+View -> Controller: Gửi yêu cầu xóa đơn nghỉ
+Controller -> Service: Gửi yêu cầu xóa đơn nghỉ trong cơ sở dữ liệu
+Service -> DB: Xóa bản ghi đơn nghỉ
+DB --> Service: Xác nhận xóa thành công
+Service --> Controller: Thông báo hoàn tất xóa
+Controller -> View: Hiển thị “Đã xóa đơn nghỉ”
+User <- View: Danh sách cập nhật, không còn bản ghi vừa xóa
+@enduml

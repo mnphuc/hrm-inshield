@@ -7,4 +7,5 @@ import vn.ts.insight.domain.employee.Employee;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByCode(String code);
     Optional<Employee> findByEmail(String email);
+
 }

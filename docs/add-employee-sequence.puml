@@ -1,0 +1,41 @@
+@startuml
+actor "Người dùng (HR/Admin)" as User
+participant "Giao diện Quản lý Nhân viên" as View
+participant "EmployeeController" as Controller
+participant "EmployeeService" as Service
+participant "UserAccountRepository" as UserRepo
+participant "EmployeeRepository" as EmpRepo
+participant "RoleRepository" as RoleRepo
+participant "MailService" as Mail
+
+== Thêm nhân viên ==
+User -> View: Nhập thông tin nhân viên mới (EmployeeRequest)
+View -> Controller: POST /cms/employees (EmployeeRequest)
+
+Controller -> Service: create(request)
+
+activate Service
+Service -> EmpRepo: Lưu nhân viên mới (employee)
+EmpRepo --> Service: Nhân viên đã lưu (có ID)
+
+alt Có email trong request
+    Service -> Service: generateUsername(employee)\ngenerateTempPassword()
+    Service -> RoleRepo: Lấy role mặc định EMPLOYEE
+    RoleRepo --> Service: Trả về Role EMPLOYEE
+
+    Service -> UserRepo: Lưu tài khoản UserAccount\n(username, password mã hóa, email, roles)
+    UserRepo --> Service: UserAccount đã lưu
+
+    Service -> EmpRepo: Gán userAccount vào employee và cập nhật
+    EmpRepo --> Service: Employee đã cập nhật
+
+    Service -> Mail: Gửi email thông tin tài khoản\n(Username, mật khẩu tạm thời)
+    Mail --> Service: Xác nhận gửi thành công
+end
+
+Service --> Controller: Trả về EmployeeResponse (kết quả tạo thành công)
+deactivate Service
+
+Controller -> View: Hiển thị thông báo “Thêm nhân viên thành công”
+User <- View: Xem danh sách có nhân viên mới
+@enduml

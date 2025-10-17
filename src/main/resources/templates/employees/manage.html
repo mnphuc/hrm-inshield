@@ -157,6 +157,16 @@
                         <label for="userId">Tài khoản liên kết</label>
                         <input id="userId" th:field="*{userId}" data-field="userId" type="number" placeholder="ID tài khoản">
                     </div>
+                    <div class="field">
+                        <label>Role</label>
+                        <div th:each="role : ${roleOptions}">
+                            <input type="checkbox"
+                                   th:value="${role}"
+                                   th:field="*{roles}" />
+                            <span th:text="${role}">ROLE</span>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="button secondary" data-close-modal>Hủy</button>

@@ -1,0 +1,56 @@
+@startuml
+actor "Người dùng (Admin/HR/Manager/Employee)" as User
+participant "Giao diện Quản lý Chi phí" as View
+participant "ExpenseController" as Controller
+participant "ExpenseService" as Service
+participant "Cơ sở dữ liệu (Database)" as DB
+
+== Xem danh sách chi phí ==
+User -> View: Mở trang Quản lý Chi phí
+View -> Controller: Gửi yêu cầu lấy danh sách chi phí
+Controller -> Service: Gửi yêu cầu lấy dữ liệu chi phí có phân trang
+Service -> DB: Truy vấn danh sách chi phí, kèm thông tin nhân viên và dự án
+DB --> Service: Trả về danh sách chi phí
+Service --> Controller: Trả dữ liệu danh sách
+Controller -> View: Gửi dữ liệu để hiển thị lên bảng
+User <- View: Xem danh sách chi phí trên giao diện
+
+== Thêm chi phí mới ==
+User -> View: Nhập thông tin chi phí và nhấn "Lưu"
+View -> Controller: Gửi yêu cầu thêm mới chi phí
+Controller -> Service: Yêu cầu lưu thông tin chi phí
+Service -> DB: Kiểm tra nhân viên và dự án hợp lệ, sau đó lưu dữ liệu chi phí
+DB --> Service: Xác nhận lưu thành công
+Service --> Controller: Trả kết quả thành công
+Controller -> View: Hiển thị thông báo “Đã tạo chi phí mới”
+User <- View: Thấy chi phí mới trong danh sách
+
+== Cập nhật chi phí ==
+User -> View: Chỉnh sửa thông tin chi phí
+View -> Controller: Gửi yêu cầu cập nhật chi phí
+Controller -> Service: Gửi yêu cầu cập nhật dữ liệu
+Service -> DB: Cập nhật thông tin chi phí trong cơ sở dữ liệu
+DB --> Service: Xác nhận cập nhật thành công
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Hiển thị “Đã cập nhật chi phí”
+User <- View: Xem thông tin mới được cập nhật
+
+== Cập nhật trạng thái chi phí ==
+User -> View: Chọn cập nhật trạng thái chi phí
+View -> Controller: Gửi yêu cầu thay đổi trạng thái
+Controller -> Service: Gửi yêu cầu cập nhật trạng thái chi phí
+Service -> DB: Cập nhật trường “status” trong cơ sở dữ liệu
+DB --> Service: Xác nhận cập nhật thành công
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Hiển thị “Cập nhật trạng thái thành công”
+
+== Xóa chi phí ==
+User -> View: Chọn xóa chi phí
+View -> Controller: Gửi yêu cầu xóa chi phí
+Controller -> Service: Gửi yêu cầu xóa bản ghi chi phí
+Service -> DB: Xóa chi phí trong cơ sở dữ liệu
+DB --> Service: Xác nhận xóa thành công
+Service --> Controller: Thông báo kết quả xóa
+Controller -> View: Hiển thị “Đã xóa chi phí”
+User <- View: Danh sách cập nhật không còn bản ghi đó
+@enduml

@@ -74,7 +74,6 @@
             </thead>
             <tbody>
             <tr th:each="payroll : ${payrolls}">
-<!--                <td th:text="${#maps.get(employeeNames, payroll.employeeId) ?: '—'}">Nhân viên</td>-->
                 <td th:text="${employeeNames[payroll.employeeId]} ?: '—'">Nhân viên</td>
                 <td th:text="${payroll.payrollMonth + '/' + payroll.payrollYear}">10/2025</td>
                 <td th:text="${#numbers.formatDecimal(payroll.baseSalary, 1, 'DEFAULT', 2, 'DEFAULT')}">0</td>

@@ -1,0 +1,43 @@
+@startuml
+actor "Người dùng (HR/Admin)" as User
+participant "Giao diện Quản lý Chấm công" as View
+participant "AttendanceController" as Controller
+participant "AttendanceService" as Service
+participant "CSDL (AttendanceRepository)" as DB
+
+== Xem danh sách ==
+User -> View: Mở trang /cms/attendance
+View -> Controller: GET /cms/attendance
+Controller -> Service: Lấy danh sách chấm công (phân trang)
+Service -> DB: Truy vấn dữ liệu từ bảng attendance_record
+DB --> Service: Trả kết quả danh sách
+Service --> Controller: Danh sách AttendanceResponse
+Controller -> View: Render HTML hiển thị danh sách
+
+== Thêm chấm công ==
+User -> View: Nhập form + nhấn “Lưu”
+View -> Controller: POST /cms/attendance
+Controller -> Service: Gọi create(request)
+Service -> DB: Lưu bản ghi mới vào bảng attendance_record
+DB --> Service: Trả kết quả thành công
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Reload danh sách + hiển thị thông báo
+
+== Cập nhật ==
+User -> View: Sửa thông tin bản ghi
+View -> Controller: POST /cms/attendance/{id}/update
+Controller -> Service: Gọi update(id, request)
+Service -> DB: Tìm và cập nhật bản ghi
+DB --> Service: Xác nhận cập nhật
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Reload danh sách
+
+== Xóa ==
+User -> View: Bấm “Xóa”
+View -> Controller: POST /cms/attendance/{id}/delete
+Controller -> Service: Gọi delete(id)
+Service -> DB: Xóa bản ghi
+DB --> Service: Xác nhận xóa
+Service --> Controller: Thông báo thành công
+Controller -> View: Reload danh sách sau khi xóa
+@enduml
