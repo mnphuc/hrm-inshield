@@ -1,0 +1,31 @@
+@startuml
+actor "Quản trị viên (Admin)" as User
+participant "Giao diện Đăng ký" as View
+participant "AuthController" as Controller
+participant "AuthService" as Service
+participant "CSDL" as DB
+
+== Mở trang đăng ký ==
+User -> View: Truy cập /auth/register
+View -> Controller: Gửi yêu cầu GET
+Controller -> View: Trả về form đăng ký (HTML)
+User <- View: Xem form trên giao diện
+
+== Gửi thông tin đăng ký ==
+User -> View: Nhập dữ liệu (username, email, mật khẩu, thông tin nhân viên...)
+View -> Controller: Gửi yêu cầu POST /auth/register
+Controller -> Service: Gọi phương thức register(request)
+
+== Xử lý đăng ký trong Service ==
+Service -> DB: Kiểm tra username và email có tồn tại không
+DB --> Service: Trả về kết quả kiểm tra
+Service -> DB: Mã hóa mật khẩu và lưu tài khoản mới
+DB --> Service: Xác nhận đã lưu tài khoản
+Service -> DB: Tạo thông tin nhân viên (nếu có)
+DB --> Service: Xác nhận đã lưu nhân viên
+Service --> Controller: Trả về thông tin tài khoản vừa tạo
+
+== Hoàn tất ==
+Controller -> View: Chuyển hướng về /auth/register với thông báo thành công
+User <- View: Thấy thông báo "Đã tạo tài khoản thành công"
+@enduml

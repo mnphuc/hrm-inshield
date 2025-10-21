@@ -1,0 +1,47 @@
+@startuml
+actor "Người dùng (Admin/Quản lý)" as User
+participant "Giao diện Quản lý Dự án" as View
+participant "ProjectController" as Controller
+participant "ProjectService" as Service
+participant "Cơ sở dữ liệu (Database)" as DB
+
+== Xem danh sách dự án ==
+User -> View: Mở trang Quản lý Dự án
+View -> Controller: Gửi yêu cầu lấy danh sách dự án
+Controller -> Service: Yêu cầu lấy dữ liệu các dự án
+Service -> DB: Truy vấn danh sách dự án trong cơ sở dữ liệu
+DB --> Service: Trả về danh sách dự án
+Service --> Controller: Gửi dữ liệu danh sách dự án
+Controller -> View: Truyền dữ liệu hiển thị lên giao diện
+User <- View: Xem danh sách các dự án hiện có
+
+== Thêm dự án mới ==
+User -> View: Nhập thông tin dự án và nhấn “Lưu”
+View -> Controller: Gửi yêu cầu thêm mới dự án
+Controller -> Service: Gửi yêu cầu lưu thông tin dự án
+Service -> DB: Ghi dữ liệu dự án mới vào cơ sở dữ liệu
+DB --> Service: Xác nhận lưu thành công
+Service --> Controller: Thông báo lưu dự án thành công
+Controller -> View: Hiển thị thông báo “Thêm mới thành công”
+User <- View: Thấy dự án mới trong danh sách
+
+== Cập nhật thông tin dự án ==
+User -> View: Sửa thông tin dự án và nhấn “Cập nhật”
+View -> Controller: Gửi yêu cầu cập nhật dự án
+Controller -> Service: Gửi yêu cầu cập nhật dữ liệu
+Service -> DB: Cập nhật thông tin dự án trong cơ sở dữ liệu
+DB --> Service: Xác nhận cập nhật thành công
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Hiển thị thông báo “Đã cập nhật dự án”
+User <- View: Xem thông tin đã được cập nhật
+
+== Xóa dự án ==
+User -> View: Chọn dự án cần xóa
+View -> Controller: Gửi yêu cầu xóa dự án
+Controller -> Service: Gửi yêu cầu xóa dữ liệu dự án
+Service -> DB: Xóa bản ghi dự án trong cơ sở dữ liệu
+DB --> Service: Xác nhận xóa thành công
+Service --> Controller: Thông báo kết quả xóa
+Controller -> View: Hiển thị thông báo “Đã xóa dự án”
+User <- View: Danh sách cập nhật không còn dự án vừa xóa
+@enduml

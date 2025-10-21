@@ -1,0 +1,39 @@
+@startuml
+actor User
+participant "Login Page" as View
+participant "Spring Security Filter" as Security
+participant "DaoAuthenticationProvider" as AuthProvider
+participant "CustomUserDetailsService" as AuthService
+database "Database" as DB
+participant "HomeController" as Controller
+
+== Truy cập trang đăng nhập ==
+User -> Controller: Gửi yêu cầu GET /login
+Controller -> View: Render trang login.html
+User <- View: Hiển thị form đăng nhập
+
+== Gửi thông tin đăng nhập ==
+User -> View: Nhập username + password
+View -> Security: Gửi POST /login
+
+== Xác thực người dùng ==
+Security -> AuthProvider: Yêu cầu xác thực (username, password)
+AuthProvider -> AuthService: Tải thông tin người dùng
+AuthService -> DB: Lấy dữ liệu người dùng từ cơ sở dữ liệu
+DB --> AuthService: Trả về thông tin tài khoản và vai trò
+AuthService --> AuthProvider: Trả về đối tượng CustomUserDetails
+AuthProvider -> AuthProvider: Kiểm tra mật khẩu bằng BCrypt
+
+alt Đăng nhập thành công
+    AuthProvider --> Security: Xác thực thành công
+    Security -> User: Redirect đến /dashboard
+    User -> Controller: Gửi GET /dashboard
+    Controller -> View: Render dashboard.html
+    User <- View: Hiển thị trang chính (Dashboard)
+else Sai thông tin đăng nhập
+    AuthProvider --> Security: Xác thực thất bại
+    Security -> User: Redirect đến /login?error
+    User -> Controller: Gửi GET /login?error
+    Controller -> View: Render lại login.html (hiển thị lỗi)
+end
+@enduml

@@ -5,7 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
+
 import org.springframework.format.annotation.DateTimeFormat;
+import vn.ts.insight.domain.common.SystemRoleName;
 
 public class EmployeeRequest {
     @NotBlank(message = "Employee code is required")
@@ -27,7 +30,7 @@ public class EmployeeRequest {
     private BigDecimal baseSalary;
     private Long managerId;
     private Long userId;
-
+    private Set<SystemRoleName> roles;
     public String getCode() {
         return code;
     }
@@ -123,4 +126,6 @@ public class EmployeeRequest {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
+    public Set<SystemRoleName> getRoles() { return roles; }
+    public void setRoles(Set<SystemRoleName> roles) { this.roles = roles; }
 }

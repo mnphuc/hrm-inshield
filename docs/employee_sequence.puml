@@ -1,0 +1,51 @@
+@startuml
+actor "Người dùng (HR/Admin)" as User
+participant "Giao diện Quản lý Nhân viên" as View
+participant "EmployeeController" as Controller
+participant "EmployeeService" as Service
+participant "CSDL (EmployeeRepository)" as DB
+
+== Xem danh sách nhân viên ==
+User -> View: Mở trang Quản lý Nhân viên
+View -> Controller: GET /cms/employees
+Controller -> Service: Lấy danh sách nhân viên (phân trang)
+Service -> DB: Truy vấn dữ liệu nhân viên
+DB --> Service: Danh sách nhân viên
+Service --> Controller: Trả danh sách nhân viên
+Controller -> View: Render giao diện danh sách
+User <- View: Hiển thị danh sách nhân viên
+
+== Thêm nhân viên ==
+User -> View: Nhập thông tin nhân viên mới
+View -> Controller: POST /cms/employees (EmployeeRequest)
+Controller -> Service: Gọi hàm create(request)
+Service -> Service: Kiểm tra và ánh xạ dữ liệu (validate + mapping)
+Service -> DB: Lưu nhân viên mới vào CSDL
+DB --> Service: Trả về đối tượng nhân viên đã lưu
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Reload danh sách + hiển thị thông báo “Thêm mới thành công”
+User <- View: Xem danh sách có nhân viên mới
+
+== Cập nhật nhân viên ==
+User -> View: Chọn chỉnh sửa thông tin nhân viên
+View -> Controller: POST /cms/employees/{id}/update (EmployeeRequest)
+Controller -> Service: Gọi hàm update(id, request)
+Service -> DB: Tìm nhân viên theo ID
+DB --> Service: Trả về thông tin nhân viên
+Service -> Service: Cập nhật thông tin mới vào entity
+Service -> DB: Ghi lại thông tin đã cập nhật
+DB --> Service: Xác nhận thành công
+Service --> Controller: Thông báo cập nhật thành công
+Controller -> View: Cập nhật lại danh sách
+User <- View: Xem danh sách đã thay đổi
+
+== Xóa nhân viên ==
+User -> View: Chọn xóa nhân viên
+View -> Controller: POST /cms/employees/{id}/delete
+Controller -> Service: Gọi hàm delete(id)
+Service -> DB: Xóa bản ghi nhân viên
+DB --> Service: Xác nhận xóa thành công
+Service --> Controller: Thông báo xóa thành công
+Controller -> View: Cập nhật lại danh sách nhân viên
+User <- View: Danh sách sau khi xóa
+@enduml

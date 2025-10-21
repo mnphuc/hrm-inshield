@@ -2,6 +2,8 @@ package vn.ts.insight.web.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.ts.insight.domain.common.SystemRoleName;
 import vn.ts.insight.service.EmployeeService;
 import vn.ts.insight.web.dto.employee.EmployeeRequest;
 import vn.ts.insight.web.dto.employee.EmployeeResponse;
@@ -35,7 +38,7 @@ public class EmployeeController {
         Model model
     ) {
         populateModel(model, page, size);
-        Long totalElements = (Long) model.getAttribute("totalElements"); // hoặc lấy từ Page<Employee>
+        Long totalElements = (Long) model.getAttribute("totalElements");
         int startIndex = page * size + 1;
         int endIndex = (int) Math.min((page + 1) * size, totalElements);
 
@@ -51,6 +54,7 @@ public class EmployeeController {
         if (!model.containsAttribute("showModal")) {
             model.addAttribute("showModal", false);
         }
+        model.addAttribute("roleOptions", SystemRoleName.values());
         model.addAttribute("pageTitle", "Quản lý nhân viên");
         model.addAttribute("pageHeader", "Danh sách nhân sự");
         return "employees/manage";
@@ -70,6 +74,9 @@ public class EmployeeController {
             redirectAttributes.addFlashAttribute("showModal", true);
             redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin nhập");
             return "redirect:/cms/employees";
+        }
+        if (request.getRoles() == null || request.getRoles().isEmpty()) {
+            request.setRoles(Set.of(SystemRoleName.EMPLOYEE));
         }
 
         employeeService.create(request);

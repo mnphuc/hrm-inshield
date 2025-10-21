@@ -1,0 +1,39 @@
+@startuml
+actor "Người dùng (Admin / HR)" as User
+participant "Giao diện Quản lý Bảng lương" as View
+participant "PayrollController" as Controller
+participant "PayrollService" as Service
+participant "Cơ sở dữ liệu" as DB
+
+== Xem danh sách bảng lương ==
+User -> View: Mở trang "Quản lý Bảng lương"
+View -> Controller: Gửi yêu cầu tải danh sách bảng lương
+Controller -> Service: Yêu cầu lấy dữ liệu bảng lương và danh sách nhân viên
+Service -> DB: Truy vấn dữ liệu từ bảng nhân viên và bảng lương
+DB --> Service: Trả về dữ liệu
+Service --> Controller: Gửi dữ liệu bảng lương và nhân viên
+Controller -> View: Truyền dữ liệu để hiển thị trên giao diện
+User <- View: Xem danh sách bảng lương trên trang
+
+== Tạo hoặc cập nhật bảng lương ==
+User -> View: Nhập thông tin lương (nhân viên, tháng, năm, lương cơ bản, thưởng, khấu trừ, v.v.)
+View -> Controller: Gửi yêu cầu lưu thông tin bảng lương
+Controller -> Service: Gửi yêu cầu xử lý tính toán và lưu dữ liệu bảng lương
+Service -> DB: Kiểm tra nhân viên và bảng lương hiện có
+Service -> DB: Nếu tồn tại thì cập nhật, nếu không thì tạo mới
+Service -> DB: Tính toán lương thực lĩnh và lưu xuống CSDL
+DB --> Service: Xác nhận lưu thành công
+Service --> Controller: Trả về kết quả xử lý
+Controller -> View: Hiển thị thông báo "Đã tạo hoặc cập nhật thành công"
+User <- View: Thấy kết quả cập nhật trên giao diện
+
+== Lọc bảng lương theo nhân viên ==
+User -> View: Chọn nhân viên cần xem
+View -> Controller: Gửi yêu cầu lọc theo nhân viên
+Controller -> Service: Lấy dữ liệu bảng lương của nhân viên đó
+Service -> DB: Truy vấn bảng lương theo ID nhân viên
+DB --> Service: Trả về kết quả
+Service --> Controller: Truyền dữ liệu đã lọc
+Controller -> View: Cập nhật danh sách hiển thị
+User <- View: Xem kết quả lọc
+@enduml
