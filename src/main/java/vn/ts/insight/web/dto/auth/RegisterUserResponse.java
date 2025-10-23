@@ -9,6 +9,10 @@ public class RegisterUserResponse {
     private String employeeCode;
     private String username;
     private String email;
+    private String password;
+    private String fullName;
+    private boolean enabled;
+    private boolean accountNonLocked;
     private Set<SystemRoleName> roles;
 
     public Long getUserId() {
@@ -35,6 +39,22 @@ public class RegisterUserResponse {
         this.employeeCode = employeeCode;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -49,6 +69,21 @@ public class RegisterUserResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFullName(){
+        return fullName;
+    }
+    public void setFullName(String fullName){
+        this.fullName = fullName;
     }
 
     public Set<SystemRoleName> getRoles() {

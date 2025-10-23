@@ -29,7 +29,7 @@
                th:classappend="${currentPath != null and currentPath.startsWith('/cms/leave')} ? 'active' : ''">Nghỉ phép</a>
             <a th:href="@{/cms/payrolls}"
                th:classappend="${currentPath != null and currentPath.startsWith('/cms/payrolls')} ? 'active' : ''">Bảng lương</a>
-            <a th:href="@{/auth/register}"
+            <a th:href="@{/auth}"
                th:classappend="${currentPath != null and currentPath.startsWith('/auth')} ? 'active' : ''">Tài khoản</a>
         </nav>
         <form th:action="@{/logout}" method="post" class="logout-form">

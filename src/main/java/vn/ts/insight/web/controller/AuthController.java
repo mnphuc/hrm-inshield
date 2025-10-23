@@ -5,10 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.ts.insight.domain.common.SystemRoleName;
 import vn.ts.insight.service.AuthService;
@@ -25,48 +22,64 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/register")
-    public String showRegisterForm(Model model) {
-        if (!model.containsAttribute("registerForm")) {
-            model.addAttribute("registerForm", new RegisterUserRequest());
+    @GetMapping
+    public String manageAccounts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model
+    ) {
+        populateModel(model, page, size);
+        Long totalElements = (Long) model.getAttribute("totalElements");
+        int startIndex = page * size + 1;
+        int endIndex = (int) Math.min((page + 1) * size, totalElements);
+
+        model.addAttribute("startIndex", startIndex);
+        model.addAttribute("endIndex", endIndex);
+
+        if (!model.containsAttribute("accountForm")) {
+            model.addAttribute("accountForm", new RegisterUserRequest());
         }
-        prepareModel(model);
-        return "auth/register";
+        if (!model.containsAttribute("showModal")) {
+            model.addAttribute("showModal", false);
+        }
+        model.addAttribute("allRoles", SystemRoleName.values());
+        model.addAttribute("pageTitle", "Quản lí tài khoản");
+        model.addAttribute("pageHeader", "Danh sách tài khoản");
+        return "auth/manage";
     }
 
-    @PostMapping("/register")
-    public String handleRegister(
-        @Valid @ModelAttribute("registerForm") RegisterUserRequest request,
-        BindingResult bindingResult,
-        RedirectAttributes redirectAttributes,
-        Model model
+    @PostMapping("/{id}/update")
+    public String updateAccount(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("accountForm") RegisterUserRequest request,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            prepareModel(model);
-            return "auth/register";
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.accountForm", bindingResult);
+            redirectAttributes.addFlashAttribute("accountForm", request);
+            redirectAttributes.addFlashAttribute("showModal", true);
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin nhập");
+            return "redirect:/auth";
         }
-
-        try {
-            authService.register(request);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã tạo tài khoản thành công");
-            return "redirect:/auth/register";
-        } catch (IllegalArgumentException ex) {
-            String message = ex.getMessage();
-            if (message.contains("Username")) {
-                bindingResult.rejectValue("username", "error.username", message);
-            } else if (message.contains("Email")) {
-                bindingResult.rejectValue("email", "error.email", message);
-            } else {
-                bindingResult.reject("registerError", message); // global error
-            }
-            prepareModel(model);
-            return "auth/register";
-        }
+        authService.update(id, request);
+        System.out.println("Roles received: " + request.getRoles());
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật tài khoản");
+        return "redirect:/auth";
     }
-
-    private void prepareModel(Model model) {
-        model.addAttribute("pageTitle", "Tạo tài khoản");
-        model.addAttribute("pageHeader", "Đăng ký người dùng mới");
-        model.addAttribute("roleOptions", SystemRoleName.values());
+    @PostMapping("/{id}/delete")
+    public String deleteAccount(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        authService.delete(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa nhân viên");
+        return "redirect:/auth";
     }
+    private void populateModel(Model model, int page, int size) {
+        var accountPage = authService.findPage(page, size);
+        model.addAttribute("accounts", accountPage.getContent());
+        model.addAttribute("currentPage", accountPage.getNumber());
+        model.addAttribute("pageSize", accountPage.getSize());
+        model.addAttribute("totalPages", accountPage.getTotalPages());
+        model.addAttribute("totalElements", accountPage.getTotalElements());    }
+
 }
