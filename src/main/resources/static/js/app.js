@@ -43,6 +43,29 @@
                 setFieldValue(element, '');
             }
         });
+        if (mode === 'edit' && dataset && dataset.valueRoles) {
+            const rolesArray = dataset.valueRoles
+                .replace(/[\[\]]/g, '')
+                .split(',')
+                .map(r => r.trim());
+            console.log('Roles to populate:', rolesArray);
+
+            form.querySelectorAll('input[name="roles"]').forEach(cb => {
+                cb.checked = false;
+            });
+
+            rolesArray.forEach(roleName => {
+                const checkbox = form.querySelector(`input[name="roles"][value="${roleName}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    console.log('Checked:', roleName);
+                }
+            });
+        } else if (mode === 'create') {
+            form.querySelectorAll('input[name="roles"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
     }
 
     function deriveAction(mode, modal, dataset) {

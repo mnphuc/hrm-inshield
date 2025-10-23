@@ -2,7 +2,13 @@ package vn.ts.insight.service;
 
 import jakarta.transaction.Transactional;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.ts.insight.domain.common.SystemRoleName;
@@ -14,6 +20,7 @@ import vn.ts.insight.repository.RoleRepository;
 import vn.ts.insight.repository.UserAccountRepository;
 import vn.ts.insight.web.dto.auth.RegisterUserRequest;
 import vn.ts.insight.web.dto.auth.RegisterUserResponse;
+import vn.ts.insight.web.mapper.AccountMapper;
 
 @Service
 public class AuthService {
@@ -22,88 +29,54 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccountMapper accountMapper;
+    private final String ACCOUNT_NOT_FOUND = "Account not found";
 
     public AuthService(
         UserAccountRepository userAccountRepository,
         RoleRepository roleRepository,
         EmployeeRepository employeeRepository,
-        PasswordEncoder passwordEncoder
-    ) {
+        PasswordEncoder passwordEncoder,
+        AccountMapper accountMapper) {
         this.userAccountRepository = userAccountRepository;
         this.roleRepository = roleRepository;
         this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
+        this.accountMapper = accountMapper;
+    }
+    public Page<RegisterUserResponse> findPage(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserAccount> result = userAccountRepository.findAll(pageable);
+        List<RegisterUserResponse> content = result.getContent().stream()
+                .map(accountMapper::toResponse)
+                .toList();
+        return new PageImpl<>(content, pageable, result.getTotalElements());
     }
 
     @Transactional
-    public RegisterUserResponse register(RegisterUserRequest request) {
-        validateUnique(request);
-
-        UserAccount account = new UserAccount();
-        account.setUsername(request.getUsername());
-        account.setEmail(request.getEmail());
-        account.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        Set<SystemRoleName> requestedRoles = request.getRoles();
-        if (requestedRoles == null || requestedRoles.isEmpty()) {
-            requestedRoles = Set.of(SystemRoleName.EMPLOYEE);
-        }
-
-        Set<Role> roles = new HashSet<>();
-        for (SystemRoleName roleName : requestedRoles) {
-            Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new IllegalArgumentException("Role " + roleName + " not configured"));
-            roles.add(role);
-        }
-        account.setRoles(roles);
-
-        userAccountRepository.save(account);
-
-        Employee employee = null;
-        if (request.getFullName() != null && !request.getFullName().isBlank()) {
-
-            if (userAccountRepository.existsByEmail(request.getEmail())) {
-                throw new IllegalArgumentException("Email already exists");
-            }
-            employee = new Employee();
-            employee.setCode(resolveEmployeeCode(request, account));
-            employee.setFullName(request.getFullName());
-            employee.setEmail(request.getEmail());
-            employee.setPhone(request.getPhone());
-            employee.setDepartment(request.getDepartment());
-            employee.setPosition(request.getPosition());
-            employee.setHireDate(request.getHireDate() != null ? request.getHireDate() : java.time.LocalDate.now());
-            employee.setEmploymentStatus("ACTIVE");
-            employee.setBaseSalary(request.getBaseSalary());
-            employee.setAccount(account);
-            employeeRepository.save(employee);
-        }
-
-        RegisterUserResponse response = new RegisterUserResponse();
-        response.setUserId(account.getId());
-        response.setUsername(account.getUsername());
-        response.setEmail(account.getEmail());
-        response.setRoles(requestedRoles);
-        if (employee != null) {
-            response.setEmployeeId(employee.getId());
-            response.setEmployeeCode(employee.getCode());
-        }
-        return response;
+    public RegisterUserResponse update (Long id, RegisterUserRequest request) {
+        UserAccount userAccount = userAccountRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND));
+        accountMapper.updateAccount(userAccount, request);
+        return accountMapper.toResponse(userAccount);
     }
 
-    private void validateUnique(RegisterUserRequest request) {
-        if (userAccountRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+    @Transactional
+    public void delete(Long id) {
+        UserAccount userAccount = userAccountRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại."));
+        boolean isAdmin = userAccount.getRoles().stream()
+                .anyMatch(role -> role.getName() == SystemRoleName.ADMIN);
+        if (isAdmin) {
+            throw new IllegalStateException("Không thể vô hiệu hóa tài khoản có quyền ADMIN.");
         }
-        if (userAccountRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+        if (!userAccount.isEnabled()) {
+            throw new IllegalStateException("Tài khoản này đã bị vô hiệu hoá trước đó.");
         }
+        userAccount.setEnabled(false);
+        userAccount.setAccountNonLocked(false);
+        userAccountRepository.save(userAccount);
     }
 
-    private String resolveEmployeeCode(RegisterUserRequest request, UserAccount account) {
-        if (request.getEmployeeCode() != null && !request.getEmployeeCode().isBlank()) {
-            return request.getEmployeeCode();
-        }
-        return "EMP-" + account.getUsername().toUpperCase();
-    }
+
 }

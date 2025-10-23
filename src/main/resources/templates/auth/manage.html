@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section th:fragment="content">
+    <div class="card">
+        <div class="table-actions">
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a class="page-link"
+                   th:classappend="${currentPage == 0}? 'disabled'"
+                   th:href="${currentPage == 0}? '#': @{/auth(page=${currentPage - 1}, size=${pageSize})}">Trang trước</a>
+                <a class="page-link"
+                   th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:text="${pageNum + 1}"
+                   th:href="@{/auth(page=${pageNum}, size=${pageSize})}"
+                   th:classappend="${pageNum == currentPage}? 'active'">1</a>
+                <a class="page-link"
+                   th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
+                   th:href="${currentPage + 1 >= totalPages}? '#': @{/auth(page=${currentPage + 1}, size=${pageSize})}">Trang sau</a>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Mã nhân viên</th>
+                    <th>Họ tên</th>
+                    <th>Tên tài khoản</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="account : ${accounts}">
+                    <td th:text="${account.userId}">1</td>
+                    <td th:text="${account.employeeCode}">EMP_001</td>
+                    <td th:text="${account.fullName}">Nguyễn Văn A</td>
+                    <td th:text="${account.username}">hungnt</td>
+                    <td th:text="${#strings.listJoin(account.roles, ', ')}"></td>
+                    <td th:text="${account.enabled and account.accountNonLocked ? 'Hoạt động' : 'Vô hiệu hóa'}"
+                        th:classappend="${account.enabled and account.accountNonLocked ? 'text-success' : 'text-danger'}">
+                    </td>
+                    <td class="actions-cell">
+                        <button type="button"
+                                class="button-link"
+                                data-open-modal="accountModal"
+                                data-mode="edit"
+                                th:attr="data-record-id=${account.userId},
+                                         data-value-employee-code=${account.employeeCode},
+                                         data-value-full-name=${account.fullName},
+                                         data-value-email=${account.email},
+                                         data-value-username = ${account.username},
+                                         data-value-roles=${#strings.listJoin(account.roles, ', ')}
+                          ">
+                            Chỉnh sửa
+                        </button>
+                        <form th:action="@{/auth/{id}/delete(id=${account.userId})}"
+                              method="post"
+                              th:attr="data-confirm-message=${'Bạn có chắc muốn vô hiệu hóa tài khoản ' + account.username + '?'}">
+                            <button type="submit" class="link danger">Vô hiệu hóa</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${accounts.isEmpty()}">
+                    <td colspan="8" class="empty">Chưa có tài khoản nào</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-summary" th:if="${totalElements > 0}">
+            <span th:text="|Đang hiển thị ${startIndex} - ${endIndex} / ${totalElements} Tài khoản|">
+                Tổng quan
+            </span>
+        </div>
+    </div>
+
+    <!-- Modal Chỉnh sửa nhân viên -->
+    <div class="modal-backdrop"
+         id="accountModal"
+         data-modal
+         th:data-open="${showModal} ? 'true' : 'false'"
+         th:data-record-id="${editId}"
+         data-update-template="/auth/__ID__/update"
+         data-edit-title="Cập nhật nhân viên"
+         data-edit-text="Cập nhật">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-modal-title>Cập nhật nhân viên</h2>
+                <button type="button" class="icon-button" data-close-modal>&times;</button>
+            </div>
+
+            <form id="employeeForm" th:object="${accountForm}" method="post">
+                <div class="modal-body grid two-columns">
+                    <div class="field">
+                        <label for="employeeCode">Tên tài khoản</label>
+                        <input id="employeeCode"
+                               th:field="*{username}"
+                               data-field="username"
+                               type="text"
+                               placeholder="Nguyen Trong Hung">
+                        <small th:if="${#fields.hasErrors('username')}"
+                               th:errors="*{username}"
+                               class="error-text">Lỗi</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="fullName">Họ tên</label>
+                        <input id="fullName"
+                               th:field="*{fullName}"
+                               data-field="fullName"
+                               type="text"
+                               placeholder="Nguyễn Văn A">
+                        <small th:if="${#fields.hasErrors('fullName')}"
+                               th:errors="*{fullName}"
+                               class="error-text">Lỗi</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email"
+                               th:field="*{email}"
+                               data-field="email"
+                               type="email"
+                               placeholder="nguoidung@techshield.vn">
+                        <small th:if="${#fields.hasErrors('email')}"
+                               th:errors="*{email}"
+                               class="error-text">Lỗi</small>
+                    </div>
+                    <div class="field">
+                        <label for="password">Mật khẩu mới</label>
+                        <input id="password"
+                               name="password"
+                               type="password"
+                               placeholder="Để trống nếu không đổi">
+                        <small th:if="${#fields.hasErrors('password')}"
+                               th:errors="*{password}"
+                               class="error-text">Lỗi</small>
+                    </div>
+
+                    <div class="field">
+                        <label>Vai trò</label>
+                        <div th:each="role : ${allRoles}">
+                            <label>
+                                <input type="checkbox"
+                                       th:field="*{roles}"
+                                       th:value="${role}" />
+                                <span th:text="${role}"></span>
+                            </label>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="button secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="button" data-modal-submit>Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</html>
