@@ -115,7 +115,8 @@
                     </div>
                     <div class="field">
                         <label for="workedHours">Số giờ</label>
-                        <input id="workedHours" th:field="*{workedHours}" data-field="workedHours" type="number" step="0.25">
+                        <input id="workedHours" th:field="*{workedHours}" data-field="workedHours" type="number" step="0.25" readonly>
+                        <small class="help-text">Số giờ sẽ được tính tự động dựa trên giờ vào và giờ ra</small>
                     </div>
                     <div class="field">
                         <label for="notes">Ghi chú</label>
@@ -129,6 +130,88 @@
             </form>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkInInput = document.getElementById('checkIn');
+            const checkOutInput = document.getElementById('checkOut');
+            const workedHoursInput = document.getElementById('workedHours');
+            const workDateInput = document.getElementById('workDate');
+            
+            function calculateWorkedHours() {
+                if (checkInInput.value && checkOutInput.value) {
+                    const checkInTime = new Date('2000-01-01T' + checkInInput.value + ':00');
+                    const checkOutTime = new Date('2000-01-01T' + checkOutInput.value + ':00');
+                    
+                    if (checkOutTime > checkInTime) {
+                        const diffMs = checkOutTime - checkInTime;
+                        const diffHours = diffMs / (1000 * 60 * 60);
+                        workedHoursInput.value = diffHours.toFixed(2);
+                    } else {
+                        workedHoursInput.value = '0';
+                    }
+                }
+            }
+            
+            function setDefaultValues() {
+                // Set today's date if not already set
+                if (!workDateInput.value) {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    workDateInput.value = `${year}-${month}-${day}`;
+                }
+                
+                // Set default time if not already set
+                if (!checkInInput.value) {
+                    checkInInput.value = '08:00';
+                }
+                if (!checkOutInput.value) {
+                    checkOutInput.value = '17:00';
+                }
+                
+                // Calculate worked hours
+                calculateWorkedHours();
+            }
+            
+            checkInInput.addEventListener('change', calculateWorkedHours);
+            checkOutInput.addEventListener('change', calculateWorkedHours);
+            
+            // Override the modal opening behavior for attendance modal
+            const modal = document.getElementById('attendanceModal');
+            if (modal) {
+                // Listen for when modal is opened
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            if (modal.classList.contains('show')) {
+                                // Check if it's create mode
+                                const mode = modal.dataset.mode;
+                                if (mode === 'create') {
+                                    setTimeout(setDefaultValues, 50);
+                                }
+                            }
+                        }
+                    });
+                });
+                observer.observe(modal, { attributes: true });
+                
+                // Also listen for the open modal button clicks
+                document.querySelectorAll('[data-open-modal="attendanceModal"]').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const mode = this.dataset.mode;
+                        if (mode === 'create') {
+                            setTimeout(setDefaultValues, 100);
+                        }
+                    });
+                });
+            }
+            
+            // Set default values on page load
+            setDefaultValues();
+        });
+    </script>
 </section>
 </html>
 

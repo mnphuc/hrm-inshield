@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section th:fragment="content">
+    <div class="card">
+        <div class="table-actions">
+            <div>
+                <button type="button" class="button" data-open-modal="partnerModal" data-mode="create">
+                    + Thêm đối tác
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filter form -->
+        <form th:action="@{/cms/partners}" method="get" class="filters">
+            <input type="text" name="name" placeholder="Tìm theo tên" th:value="${param.name}">
+            <select name="status">
+                <option value="">Tất cả trạng thái</option>
+                <option value="ACTIVE" th:selected="${param.status == 'ACTIVE'}">Hoạt động</option>
+                <option value="INACTIVE" th:selected="${param.status == 'INACTIVE'}">Không hoạt động</option>
+                <option value="SUSPENDED" th:selected="${param.status == 'SUSPENDED'}">Tạm dừng</option>
+            </select>
+            <select name="partnerType">
+                <option value="">Tất cả loại</option>
+                <option th:each="type : ${partnerTypes}" 
+                        th:value="${type}" 
+                        th:selected="${param.partnerType == type}"
+                        th:text="${type.displayName}"></option>
+            </select>
+            <button type="submit" class="button secondary">Lọc</button>
+        </form>
+        
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Loại</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày bắt đầu</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="partner : ${partners}">
+                        <td th:text="${partner.code}"></td>
+                        <td th:text="${partner.name}"></td>
+                        <td th:text="${partner.email}"></td>
+                        <td th:text="${partner.phone}"></td>
+                        <td th:text="${partner.partnerType.displayName}"></td>
+                        <td th:text="${partner.status}"></td>
+                        <td th:text="${#temporals.format(partner.startDate, 'dd/MM/yyyy')}"></td>
+                        <td class="actions-cell">
+                            <button type="button" class="button-link" data-open-modal="partnerModal" data-mode="edit"
+                                    th:attr="data-record-id=${partner.id},
+                                             data-update-url=@{/cms/partners/{id}/update(id=${partner.id})},
+                                             data-value-code=${partner.code},
+                                             data-value-name=${partner.name},
+                                             data-value-email=${partner.email},
+                                             data-value-phone=${partner.phone},
+                                             data-value-address=${partner.address},
+                                             data-value-partner-type=${partner.partnerType},
+                                             data-value-status=${partner.status},
+                                             data-value-start-date=${partner.startDate},
+                                             data-value-notes=${partner.notes}">
+                                Chỉnh sửa
+                            </button>
+                            <form th:action="@{/cms/partners/{id}/delete(id=${partner.id})}" method="post"
+                                  th:attr="data-confirm-message=${'Bạn có chắc muốn xóa ' + partner.name + '?'}">
+                                <button type="submit" class="link danger">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${partners.isEmpty()}">
+                        <td colspan="8" class="empty">Chưa có đối tác nào</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-backdrop"
+         id="partnerModal"
+         data-modal
+         th:data-open="${showModal} ? 'true' : 'false'"
+         th:data-mode="${modalMode}"
+         th:data-record-id="${editId}"
+         th:data-create-url="@{/cms/partners}"
+         data-create-title="Thêm đối tác"
+         data-edit-title="Cập nhật đối tác"
+         data-create-text="Lưu"
+         data-edit-text="Cập nhật">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-modal-title>Quản lý đối tác</h2>
+                <button type="button" class="icon-button" data-close-modal>&times;</button>
+            </div>
+            <form id="partnerForm" th:action="@{/cms/partners}" th:object="${partnerForm}" method="post">
+                <div class="modal-body grid two-columns">
+                    <div class="field">
+                        <label for="code">Mã đối tác</label>
+                        <input id="code" th:field="*{code}" data-field="code" type="text" placeholder="PART-001">
+                        <small th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error-text">Lỗi</small>
+                    </div>
+                    <div class="field">
+                        <label for="name">Tên đối tác</label>
+                        <input id="name" th:field="*{name}" data-field="name" type="text" placeholder="Công ty ABC">
+                        <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-text">Lỗi</small>
+                    </div>
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" th:field="*{email}" data-field="email" type="email" placeholder="contact@abc.com">
+                        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text">Lỗi</small>
+                    </div>
+                    <div class="field">
+                        <label for="phone">Số điện thoại</label>
+                        <input id="phone" th:field="*{phone}" data-field="phone" type="text" placeholder="0901234567">
+                    </div>
+                    <div class="field">
+                        <label for="address">Địa chỉ</label>
+                        <textarea id="address" th:field="*{address}" data-field="address" placeholder="123 Đường ABC, Quận 1, TP.HCM"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="partnerType">Loại đối tác</label>
+                        <select id="partnerType" th:field="*{partnerType}" data-field="partnerType">
+                            <option value="">-- Chọn loại đối tác --</option>
+                            <option th:each="type : ${partnerTypes}" 
+                                    th:value="${type}" 
+                                    th:text="${type.displayName}"></option>
+                        </select>
+                        <small th:if="${#fields.hasErrors('partnerType')}" th:errors="*{partnerType}" class="error-text">Lỗi</small>
+                    </div>
+                    <div class="field">
+                        <label for="status">Trạng thái</label>
+                        <select id="status" th:field="*{status}" data-field="status">
+                            <option value="">-- Chọn trạng thái --</option>
+                            <option value="ACTIVE">Hoạt động</option>
+                            <option value="INACTIVE">Không hoạt động</option>
+                            <option value="SUSPENDED">Tạm dừng</option>
+                        </select>
+                        <small th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="error-text">Lỗi</small>
+                    </div>
+                    <div class="field">
+                        <label for="startDate">Ngày bắt đầu</label>
+                        <input id="startDate" th:field="*{startDate}" data-field="startDate" type="date">
+                    </div>
+                    <div class="field">
+                        <label for="notes">Ghi chú</label>
+                        <textarea id="notes" th:field="*{notes}" data-field="notes" placeholder="Ghi chú về đối tác"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button secondary" data-close-modal>Hủy</button>
+                    <button type="submit" class="button" data-modal-submit>Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

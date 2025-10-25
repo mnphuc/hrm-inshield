@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
 import java.text.Normalizer;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
@@ -69,10 +70,23 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeResponse create(EmployeeRequest request) {
+        // Kiểm tra mã nhân viên trùng lặp
+        if (employeeRepository.findByCode(request.getCode()).isPresent()) {
+            throw new IllegalArgumentException("Mã nhân viên '" + request.getCode() + "' đã tồn tại");
+        }
+        
+        // Kiểm tra email trùng lặp
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            if (employeeRepository.findByEmail(request.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("Email '" + request.getEmail() + "' đã tồn tại");
+            }
+        }
+        
         Employee employee = new Employee();
         employeeMapper.updateEntity(employee, request);
         applyRelations(employee, request);
         employeeRepository.save(employee);
+        
         if(request.getEmail() != null && !request.getEmail().isBlank()) {
             UserAccount account = new UserAccount();
             account.setUsername(generateUsername(employee));
@@ -97,6 +111,21 @@ public class EmployeeService {
     public EmployeeResponse update(Long id, EmployeeRequest request) {
         Employee employee = employeeRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException(EMPLOYEE_NOT_FOUND));
+        
+        // Kiểm tra mã nhân viên trùng lặp (trừ chính nó)
+        Optional<Employee> existingByCode = employeeRepository.findByCode(request.getCode());
+        if (existingByCode.isPresent() && !existingByCode.get().getId().equals(id)) {
+            throw new IllegalArgumentException("Mã nhân viên '" + request.getCode() + "' đã tồn tại");
+        }
+        
+        // Kiểm tra email trùng lặp (trừ chính nó)
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            Optional<Employee> existingByEmail = employeeRepository.findByEmail(request.getEmail());
+            if (existingByEmail.isPresent() && !existingByEmail.get().getId().equals(id)) {
+                throw new IllegalArgumentException("Email '" + request.getEmail() + "' đã tồn tại");
+            }
+        }
+        
         employeeMapper.updateEntity(employee, request);
         applyRelations(employee, request);
         return employeeMapper.toResponse(employee);

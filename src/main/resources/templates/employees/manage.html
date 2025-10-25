@@ -99,74 +99,99 @@
                 <button type="button" class="icon-button" data-close-modal>&times;</button>
             </div>
             <form id="employeeForm" th:action="@{/cms/employees}" th:object="${employeeForm}" method="post">
-                <div class="modal-body grid two-columns">
-                    <div class="field">
-                        <label for="code">Mã nhân viên</label>
-                        <input id="code" th:field="*{code}" data-field="code" type="text" placeholder="EMP-001">
-                        <small th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error-text">Lỗi</small>
-                    </div>
-                    <div class="field">
-                        <label for="fullName">Họ tên</label>
-                        <input id="fullName" th:field="*{fullName}" data-field="fullName" type="text" placeholder="Nguyễn Văn A">
-                        <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error-text">Lỗi</small>
-                    </div>
-                    <div class="field">
-                        <label for="email">Email</label>
-                        <input id="email" th:field="*{email}" data-field="email" type="email" placeholder="nguoidung@techshield.vn">
-                        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text">Lỗi</small>
-                    </div>
-                    <div class="field">
-                        <label for="phone">Điện thoại</label>
-                        <input id="phone" th:field="*{phone}" data-field="phone" type="text" placeholder="0901234567">
-                    </div>
-                    <div class="field">
-                        <label for="department">Phòng ban</label>
-                        <input id="department" th:field="*{department}" data-field="department" type="text" placeholder="Kinh doanh">
-                    </div>
-                    <div class="field">
-                        <label for="position">Chức vụ</label>
-                        <input id="position" th:field="*{position}" data-field="position" type="text" placeholder="Trưởng nhóm">
-                    </div>
-                    <div class="field">
-                        <label for="hireDate">Ngày vào làm</label>
-                        <input id="hireDate" th:field="*{hireDate}" data-field="hireDate" type="date">
-                        <small th:if="${#fields.hasErrors('hireDate')}" th:errors="*{hireDate}" class="error-text">Lỗi</small>
-                    </div>
-                    <div class="field">
-                        <label for="terminationDate">Ngày nghỉ việc</label>
-                        <input id="terminationDate" th:field="*{terminationDate}" data-field="terminationDate" type="date">
-                    </div>
-                    <div class="field">
-                        <label for="employmentStatus">Trạng thái</label>
-                        <input id="employmentStatus" th:field="*{employmentStatus}" data-field="employmentStatus" type="text" placeholder="ĐANG LÀM VIỆC">
-                    </div>
-                    <div class="field">
-                        <label for="baseSalary">Lương cơ bản</label>
-                        <input id="baseSalary" th:field="*{baseSalary}" data-field="baseSalary" type="number" step="0.01" placeholder="15000000">
-                    </div>
-                    <div class="field">
-                        <label for="managerId">Quản lý trực tiếp</label>
-                        <select id="managerId" th:field="*{managerId}" data-field="managerId">
-                            <option value="">-- Không có --</option>
-                            <option th:each="manager : ${managerOptions}"
-                                    th:value="${manager.id}"
-                                    th:text="${manager.fullName}">Quản lý</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="userId">Tài khoản liên kết</label>
-                        <input id="userId" th:field="*{userId}" data-field="userId" type="number" placeholder="ID tài khoản">
-                    </div>
-                    <div class="field">
-                        <label>Role</label>
-                        <div th:each="role : ${roleOptions}">
-                            <input type="checkbox"
-                                   th:value="${role}"
-                                   th:field="*{roles}" />
-                            <span th:text="${role}">ROLE</span>
+                <div class="modal-body">
+                    <!-- Thông tin cơ bản -->
+                    <div class="form-section">
+                        <h3 class="section-title">Thông tin cơ bản</h3>
+                        <div class="grid two-columns">
+                            <div class="field">
+                                <label for="code">Mã nhân viên</label>
+                                <input id="code" th:field="*{code}" data-field="code" type="text" placeholder="EMP-001">
+                                <small th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error-text">Lỗi</small>
+                            </div>
+                            <div class="field">
+                                <label for="fullName">Họ tên</label>
+                                <input id="fullName" th:field="*{fullName}" data-field="fullName" type="text" placeholder="Nguyễn Văn A">
+                                <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error-text">Lỗi</small>
+                            </div>
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" th:field="*{email}" data-field="email" type="email" placeholder="nguoidung@techshield.vn">
+                                <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text">Lỗi</small>
+                            </div>
+                            <div class="field">
+                                <label for="phone">Điện thoại</label>
+                                <input id="phone" th:field="*{phone}" data-field="phone" type="text" placeholder="0901234567">
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Thông tin công việc -->
+                    <div class="form-section">
+                        <h3 class="section-title">Thông tin công việc</h3>
+                        <div class="grid two-columns">
+                            <div class="field">
+                                <label for="department">Phòng ban</label>
+                                <input id="department" th:field="*{department}" data-field="department" type="text" placeholder="Kinh doanh">
+                            </div>
+                            <div class="field">
+                                <label for="position">Chức vụ</label>
+                                <input id="position" th:field="*{position}" data-field="position" type="text" placeholder="Trưởng nhóm">
+                            </div>
+                            <div class="field">
+                                <label for="hireDate">Ngày vào làm</label>
+                                <input id="hireDate" th:field="*{hireDate}" data-field="hireDate" type="date">
+                                <small th:if="${#fields.hasErrors('hireDate')}" th:errors="*{hireDate}" class="error-text">Lỗi</small>
+                            </div>
+                            <div class="field">
+                                <label for="terminationDate">Ngày nghỉ việc</label>
+                                <input id="terminationDate" th:field="*{terminationDate}" data-field="terminationDate" type="date">
+                            </div>
+                            <div class="field">
+                                <label for="employmentStatus">Trạng thái</label>
+                                <input id="employmentStatus" th:field="*{employmentStatus}" data-field="employmentStatus" type="text" placeholder="ĐANG LÀM VIỆC">
+                            </div>
+                            <div class="field">
+                                <label for="baseSalary">Lương cơ bản</label>
+                                <input id="baseSalary" th:field="*{baseSalary}" data-field="baseSalary" type="number" step="0.01" placeholder="15000000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin quản lý -->
+                    <div class="form-section">
+                        <h3 class="section-title">Thông tin quản lý</h3>
+                        <div class="grid two-columns">
+                            <div class="field">
+                                <label for="managerId">Quản lý trực tiếp</label>
+                                <select id="managerId" th:field="*{managerId}" data-field="managerId">
+                                    <option value="">-- Không có --</option>
+                                    <option th:each="manager : ${managerOptions}"
+                                            th:value="${manager.id}"
+                                            th:text="${manager.fullName}">Quản lý</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="userId">Tài khoản liên kết</label>
+                                <input id="userId" th:field="*{userId}" data-field="userId" type="number" placeholder="ID tài khoản">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phân quyền -->
+                    <div class="form-section">
+                        <h3 class="section-title">Phân quyền</h3>
+                        <div class="checkbox-group">
+                            <div th:each="role : ${roleOptions}">
+                                <label>
+                                    <input type="checkbox"
+                                           th:value="${role}"
+                                           th:field="*{roles}" />
+                                    <span th:text="${role}">ROLE</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="button secondary" data-close-modal>Hủy</button>

@@ -45,7 +45,14 @@ public class AttendanceController {
         model.addAttribute("pageHeader", "Quản lý chấm công");
         populateModel(model, page, size);
         if (!model.containsAttribute("attendanceForm")) {
-            model.addAttribute("attendanceForm", new AttendanceRequest());
+            AttendanceRequest attendanceForm = new AttendanceRequest();
+            // Set default values
+            attendanceForm.setWorkDate(java.time.LocalDate.now());
+            attendanceForm.setCheckIn(java.time.LocalTime.of(8, 0));
+            attendanceForm.setCheckOut(java.time.LocalTime.of(17, 0));
+            // Calculate default worked hours (9 hours)
+            attendanceForm.setWorkedHours(java.math.BigDecimal.valueOf(9.0));
+            model.addAttribute("attendanceForm", attendanceForm);
         }
         if (!model.containsAttribute("modalMode")) {
             model.addAttribute("modalMode", "create");

@@ -1,7 +1,10 @@
 package vn.ts.insight.service;
 
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
@@ -88,7 +91,24 @@ public class AttendanceService {
         record.setWorkDate(request.getWorkDate());
         record.setCheckIn(request.getCheckIn());
         record.setCheckOut(request.getCheckOut());
-        record.setWorkedHours(request.getWorkedHours());
+        
+        // Tự động tính số giờ làm nếu có giờ vào và giờ ra
+        if (request.getCheckIn() != null && request.getCheckOut() != null) {
+            BigDecimal workedHours = calculateWorkedHours(request.getCheckIn(), request.getCheckOut());
+            record.setWorkedHours(workedHours);
+        } else {
+            record.setWorkedHours(request.getWorkedHours());
+        }
+        
         record.setNotes(request.getNotes());
+    }
+    
+    private BigDecimal calculateWorkedHours(LocalTime checkIn, LocalTime checkOut) {
+        if (checkOut.isAfter(checkIn)) {
+            long minutes = ChronoUnit.MINUTES.between(checkIn, checkOut);
+            double hours = minutes / 60.0;
+            return BigDecimal.valueOf(hours).setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+        return BigDecimal.ZERO;
     }
 }

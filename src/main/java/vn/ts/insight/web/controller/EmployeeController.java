@@ -79,8 +79,16 @@ public class EmployeeController {
             request.setRoles(Set.of(SystemRoleName.EMPLOYEE));
         }
 
-        employeeService.create(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã thêm nhân viên mới");
+        try {
+            employeeService.create(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã thêm nhân viên mới");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.employeeForm", bindingResult);
+            redirectAttributes.addFlashAttribute("employeeForm", request);
+            redirectAttributes.addFlashAttribute("modalMode", "create");
+            redirectAttributes.addFlashAttribute("showModal", true);
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/cms/employees";
     }
 
@@ -102,8 +110,17 @@ public class EmployeeController {
             return "redirect:/cms/employees";
         }
 
-        employeeService.update(id, request);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật nhân viên");
+        try {
+            employeeService.update(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật nhân viên");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.employeeForm", bindingResult);
+            redirectAttributes.addFlashAttribute("employeeForm", request);
+            redirectAttributes.addFlashAttribute("editId", id);
+            redirectAttributes.addFlashAttribute("modalMode", "edit");
+            redirectAttributes.addFlashAttribute("showModal", true);
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
         return "redirect:/cms/employees";
     }
 
