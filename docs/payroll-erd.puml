@@ -1,0 +1,59 @@
+@startuml
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PK(x) <b><color:#b8861b><&key></color> x</b>
+!define FK(x) <color:#aaaaaa></color> x
+!define NN(x) <color:#ef4444></color> x
+!define UQ(x) <color:#3b82f6></color> x
+
+package "Payroll Management" {
+    TABLE(payrolls, "payrolls") {
+        PK(id) BIGINT AUTO_INCREMENT
+        FK(employee_id) BIGINT NOT NULL
+        NN(payroll_year) INT NOT NULL
+        NN(payroll_month) INT NOT NULL
+        NN(base_salary) DECIMAL(12,2) NOT NULL
+        overtime_hours DECIMAL(5,2) DEFAULT 0
+        overtime_amount DECIMAL(12,2) DEFAULT 0
+        bonus DECIMAL(12,2) DEFAULT 0
+        deductions DECIMAL(12,2) DEFAULT 0
+        NN(net_pay) DECIMAL(12,2) NOT NULL
+        NN(generated_at) DATE NOT NULL
+    }
+
+    TABLE(employees, "employees") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(full_name) VARCHAR(150) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        phone VARCHAR(30)
+        department VARCHAR(100)
+        position VARCHAR(100)
+        NN(hire_date) DATE NOT NULL
+        termination_date DATE
+        employment_status VARCHAR(50)
+        base_salary DECIMAL(12,2)
+        FK(manager_id) BIGINT
+        FK(user_id) BIGINT
+    }
+}
+
+' Relationships
+employees ||--o{ payrolls : "employee_id"
+
+note right of payrolls
+  **Payroll Record**
+  - Quản lý bảng lương theo kỳ (tháng/năm)
+  - Tự động tính lương thực lĩnh
+  - Công thức: net_pay = base_salary + overtime_amount + bonus - deductions
+  - Unique constraint: (employee_id, payroll_year, payroll_month)
+  - Lưu lịch sử lương theo từng kỳ
+end note
+
+note right of employees
+  **Employee Reference**
+  - Thông tin nhân viên nhận lương
+  - Liên kết 1-nhiều với payrolls
+  - Quản lý lương cơ bản
+end note
+@enduml
+

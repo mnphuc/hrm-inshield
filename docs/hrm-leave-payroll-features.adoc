@@ -1,0 +1,450 @@
+= Tài liệu Chức năng Quản lý Nghỉ phép và Bảng lương HRM InShield
+:author: TechShield Development Team
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums:
+:imagesdir: images
+:plantuml-server-url: https://www.plantuml.com/plantuml/svg/
+:source-highlighter: highlight.js
+:icons: font
+:experimental:
+
+== Giới thiệu
+
+=== Tổng quan các chức năng
+
+Tài liệu này mô tả chi tiết 2 chức năng quản lý quan trọng của hệ thống HRM InShield:
+
+* Quản lý Nghỉ phép (Leave Management)
+* Quản lý Bảng lương (Payroll Management)
+
+Mỗi chức năng bao gồm: khảo sát hệ thống, kịch bản sử dụng, biểu đồ thực thể, thiết kế cơ sở dữ liệu và giao diện người dùng.
+
+=== Mục đích tài liệu
+
+Tài liệu này cung cấp:
+
+* Mô tả chi tiết các chức năng quản lý nghỉ phép và bảng lương
+* Luồng xử lý nghiệp vụ từng chức năng
+* Thiết kế cơ sở dữ liệu và biểu đồ ERD
+* Hướng dẫn sử dụng giao diện người dùng
+
+== Chức năng Quản lý Nghỉ phép
+
+=== Khảo sát hệ thống
+
+==== Kiến trúc hệ thống
+
+Hệ thống quản lý nghỉ phép được xây dựng trên nền tảng Spring Boot với kiến trúc MVC:
+
+* **Backend**: Spring Boot 3.x, Spring Data JPA, Spring Security
+* **Frontend**: Thymeleaf templates, Bootstrap CSS
+* **Database**: MariaDB với Liquibase migration
+* **Authentication**: Spring Security với role-based access control
+
+==== Công nghệ sử dụng
+
+[cols="1,2,1"]
+|===
+|Công nghệ |Mô tả |Phiên bản
+
+|Spring Boot
+|Framework chính cho backend
+|3.x
+
+|Spring Data JPA
+|ORM và truy vấn database
+|3.x
+
+|Thymeleaf
+|Template engine cho frontend
+|3.x
+
+|MariaDB
+|Hệ quản trị cơ sở dữ liệu
+|10.x
+
+|Liquibase
+|Database migration tool
+|4.x
+
+|Bootstrap
+|CSS framework cho UI
+|5.x
+|===
+
+=== Kịch bản sử dụng
+
+==== Use Case 1: Gửi đơn xin nghỉ phép
+
+**Mô tả**: Nhân viên/HR/Admin tạo đơn xin nghỉ phép mới
+
+**Luồng thực hiện**:
+1. Truy cập menu "Nghỉ phép"
+2. Điền form thông tin đơn nghỉ:
+   - Chọn nhân viên
+   - Chọn loại nghỉ (ANNUAL, SICK, UNPAID, MATERNITY, PATERNITY, COMPENSATORY, OTHER)
+   - Nhập ngày bắt đầu và ngày kết thúc
+   - Hệ thống tự động tính tổng số ngày
+   - Nhập lý do (tùy chọn)
+3. Click "Gửi đơn"
+4. Hệ thống tạo đơn nghỉ với trạng thái PENDING
+
+**Kết quả**: Đơn nghỉ được tạo và chờ duyệt
+
+==== Use Case 2: Xem danh sách đơn nghỉ
+
+**Mô tả**: HR/Admin xem danh sách tất cả đơn nghỉ phép
+
+**Luồng thực hiện**:
+1. Truy cập menu "Nghỉ phép"
+2. Hệ thống hiển thị 2 bảng:
+   - **Chờ duyệt**: Các đơn chưa được xử lý
+   - **Tất cả đơn**: Lịch sử tất cả đơn nghỉ
+3. Xem thông tin: Nhân viên, Loại nghỉ, Thời gian, Trạng thái, Người duyệt
+
+**Kết quả**: Danh sách đơn nghỉ được hiển thị
+
+==== Use Case 3: Duyệt/Từ chối đơn nghỉ
+
+**Mô tả**: HR/Manager/Admin cập nhật trạng thái đơn nghỉ
+
+**Luồng thực hiện**:
+1. Chọn đơn nghỉ trong bảng "Chờ duyệt"
+2. Chọn trạng thái mới:
+   - APPROVED: Duyệt đơn
+   - REJECTED: Từ chối đơn
+   - CANCELLED: Hủy đơn
+3. Chọn người duyệt từ danh sách nhân viên
+4. Click "Cập nhật"
+5. Hệ thống cập nhật trạng thái và thời gian quyết định
+
+**Kết quả**: Trạng thái đơn nghỉ được cập nhật
+
+==== Use Case 4: Xóa đơn nghỉ
+
+**Mô tả**: HR/Admin xóa đơn nghỉ khỏi hệ thống
+
+**Luồng thực hiện**:
+1. Click "Xóa" trên đơn nghỉ cần xóa
+2. Xác nhận xóa
+3. Hệ thống xóa bản ghi khỏi cơ sở dữ liệu
+
+**Kết quả**: Đơn nghỉ bị xóa khỏi hệ thống
+
+=== Biểu đồ Sequence
+
+==== Luồng gửi đơn nghỉ phép
+
+[plantuml, leave-sequence, svg]
+----
+include::leave_sequence.puml[]
+----
+
+=== Biểu đồ Thực thể (ERD)
+
+[plantuml, leave-erd, svg]
+....
+include::leave-erd.puml[]
+....
+
+=== Thiết kế Cơ sở Dữ liệu
+
+==== Bảng leave_requests
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|employee_id
+|BIGINT
+|NOT NULL, FK
+|ID nhân viên
+
+|type
+|VARCHAR(50)
+|NOT NULL
+|Loại nghỉ (ANNUAL, SICK, UNPAID, MATERNITY, PATERNITY, COMPENSATORY, OTHER)
+
+|start_date
+|DATE
+|NOT NULL
+|Ngày bắt đầu nghỉ
+
+|end_date
+|DATE
+|NOT NULL
+|Ngày kết thúc nghỉ
+
+|total_days
+|DECIMAL(5,2)
+|NOT NULL
+|Tổng số ngày nghỉ
+
+|reason
+|VARCHAR(255)
+|NULL
+|Lý do nghỉ phép
+
+|status
+|VARCHAR(50)
+|NOT NULL
+|Trạng thái (PENDING, APPROVED, REJECTED, CANCELLED)
+
+|approver_id
+|BIGINT
+|FK
+|ID người duyệt
+
+|decided_at
+|DATETIME
+|NULL
+|Thời điểm quyết định
+|===
+
+**Các loại nghỉ phép (LeaveType)**:
+
+* ANNUAL: Nghỉ phép năm
+* SICK: Nghỉ ốm
+* UNPAID: Nghỉ không lương
+* MATERNITY: Nghỉ thai sản
+* PATERNITY: Nghỉ chăm sóc con
+* COMPENSATORY: Nghỉ bù
+* OTHER: Khác
+
+**Trạng thái đơn (LeaveStatus)**:
+
+* PENDING: Chờ duyệt
+* APPROVED: Đã duyệt
+* REJECTED: Đã từ chối
+* CANCELLED: Đã hủy
+
+**Ràng buộc đặc biệt**:
+
+* Mối quan hệ 1-nhiều giữa employees và leave_requests
+* Người duyệt (approver_id) tham chiếu đến employees
+
+=== Giao diện Người dùng
+
+==== Màn hình Quản lý Nghỉ phép
+
+Trang quản lý nghỉ phép bao gồm 3 phần chính:
+
+1. **Form tạo đơn mới**: Cho phép nhập thông tin đơn nghỉ
+2. **Bảng chờ duyệt**: Hiển thị các đơn chưa được xử lý, có thể cập nhật trạng thái
+3. **Bảng tất cả đơn**: Lịch sử đầy đủ các đơn nghỉ phép
+
+image::leave-list.png[Màn hình Quản lý Nghỉ phép, width=100%]
+
+== Chức năng Quản lý Bảng lương
+
+=== Khảo sát hệ thống
+
+==== Kiến trúc hệ thống
+
+Hệ thống quản lý bảng lương được xây dựng với các tính năng:
+
+* Tính toán lương thực lĩnh tự động
+* Quản lý theo kỳ lương (tháng/năm)
+* Hỗ trợ lương cơ bản, tăng ca, thưởng, khấu trừ
+* Lịch sử lương theo từng nhân viên
+
+==== Công nghệ sử dụng
+
+Cùng công nghệ với phần Quản lý Nghỉ phép:
+
+* Spring Boot 3.x
+* Spring Data JPA
+* Thymeleaf + Bootstrap
+* MariaDB + Liquibase
+
+=== Kịch bản sử dụng
+
+==== Use Case 1: Tạo bảng lương
+
+**Mô tả**: HR/Admin tạo bảng lương cho nhân viên
+
+**Luồng thực hiện**:
+1. Truy cập menu "Bảng lương"
+2. Điền form thông tin lương:
+   - Chọn nhân viên
+   - Nhập năm và tháng lương
+   - Nhập lương cơ bản
+   - Nhập số giờ tăng ca và tiền tăng ca
+   - Nhập thưởng (nếu có)
+   - Nhập khấu trừ (nếu có)
+3. Click "Tính bảng lương"
+4. Hệ thống tự động tính lương thực lĩnh: `net_pay = base_salary + overtime_amount + bonus - deductions`
+
+**Kết quả**: Bảng lương được tạo và lưu vào cơ sở dữ liệu
+
+==== Use Case 2: Xem danh sách bảng lương
+
+**Mô tả**: HR/Admin xem tất cả bảng lương đã tạo
+
+**Luồng thực hiện**:
+1. Truy cập menu "Bảng lương"
+2. Xem bảng danh sách với thông tin:
+   - Nhân viên
+   - Kỳ lương (tháng/năm)
+   - Lương cơ bản
+   - Tăng ca (giờ và tiền)
+   - Thưởng
+   - Khấu trừ
+   - Thực lĩnh
+
+**Kết quả**: Danh sách bảng lương được hiển thị
+
+==== Use Case 3: Lọc bảng lương theo nhân viên
+
+**Mô tả**: HR/Admin xem lịch sử lương của một nhân viên
+
+**Luồng thực hiện**:
+1. Chọn nhân viên từ dropdown "Tất cả nhân viên"
+2. Click "Lọc"
+3. Hệ thống chỉ hiển thị bảng lương của nhân viên đó
+
+**Kết quả**: Lịch sử lương của nhân viên được hiển thị
+
+=== Biểu đồ Sequence
+
+==== Luồng tạo và quản lý bảng lương
+
+[plantuml, payroll-sequence, svg]
+....
+include::payroll_sequence.puml[]
+....
+
+=== Biểu đồ Thực thể (ERD)
+
+[plantuml, payroll-erd, svg]
+....
+include::payroll-erd.puml[]
+....
+
+=== Thiết kế Cơ sở Dữ liệu
+
+==== Bảng payrolls
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|employee_id
+|BIGINT
+|NOT NULL, FK
+|ID nhân viên
+
+|payroll_year
+|INT
+|NOT NULL
+|Năm lương
+
+|payroll_month
+|INT
+|NOT NULL
+|Tháng lương (1-12)
+
+|base_salary
+|DECIMAL(12,2)
+|NOT NULL
+|Lương cơ bản
+
+|overtime_hours
+|DECIMAL(5,2)
+|DEFAULT 0
+|Số giờ tăng ca
+
+|overtime_amount
+|DECIMAL(12,2)
+|DEFAULT 0
+|Tiền tăng ca
+
+|bonus
+|DECIMAL(12,2)
+|DEFAULT 0
+|Thưởng
+
+|deductions
+|DECIMAL(12,2)
+|DEFAULT 0
+|Khấu trừ
+
+|net_pay
+|DECIMAL(12,2)
+|NOT NULL
+|Lương thực lĩnh
+
+|generated_at
+|DATE
+|NOT NULL
+|Ngày tạo bảng lương
+|===
+
+**Công thức tính lương**:
+
+```
+net_pay = base_salary + overtime_amount + bonus - deductions
+```
+
+**Ràng buộc đặc biệt**:
+
+* Unique constraint: (employee_id, payroll_year, payroll_month) - Mỗi nhân viên chỉ có 1 bảng lương/kỳ
+* Mối quan hệ 1-nhiều giữa employees và payrolls
+
+=== Giao diện Người dùng
+
+==== Màn hình Quản lý Bảng lương
+
+Trang quản lý bảng lương bao gồm 2 phần chính:
+
+1. **Form tạo bảng lương**: Cho phép nhập thông tin lương và tính toán tự động
+2. **Bảng danh sách**: Hiển thị tất cả bảng lương với bộ lọc theo nhân viên
+
+image::payroll-list.png[Màn hình Quản lý Bảng lương, width=100%]
+
+== Kết luận
+
+Tài liệu này đã mô tả chi tiết 2 chức năng quản lý quan trọng của hệ thống HRM InShield:
+
+* **Quản lý Nghỉ phép**: Quản lý đơn xin nghỉ với quy trình phê duyệt, hỗ trợ nhiều loại nghỉ phép
+* **Quản lý Bảng lương**: Tính toán và quản lý lương theo kỳ, hỗ trợ lương cơ bản, tăng ca, thưởng, khấu trừ
+
+Mỗi chức năng được thiết kế với:
+
+* Kiến trúc rõ ràng với Spring Boot MVC
+* Luồng xử lý logic và trực quan
+* Thiết kế cơ sở dữ liệu hợp lý
+* Giao diện người dùng thân thiện
+
+=== Công nghệ và Kiến trúc
+
+Hệ thống sử dụng:
+
+* **Backend**: Spring Boot 3.x, Spring Data JPA, Spring Security
+* **Frontend**: Thymeleaf, Bootstrap 5.x
+* **Database**: MariaDB 10.x với Liquibase migration
+* **Security**: Role-based access control
+
+=== Hướng phát triển
+
+Các chức năng có thể được mở rộng với:
+
+* Tích hợp email gửi thông báo phê duyệt đơn nghỉ
+* Tự động tính toán giờ làm việc từ attendance records
+* Báo cáo thống kê nghỉ phép và lương
+* Export PDF cho bảng lương
+* Duyệt đơn nghỉ theo workflow
+* Tích hợp API với hệ thống bên ngoài
+

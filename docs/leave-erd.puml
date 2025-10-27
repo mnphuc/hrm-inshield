@@ -1,0 +1,59 @@
+@startuml
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PK(x) <b><color:#b8861b><&key></color> x</b>
+!define FK(x) <color:#aaaaaa></color> x
+!define NN(x) <color:#ef4444></color> x
+!define UQ(x) <color:#3b82f6></color> x
+
+package "Leave Management" {
+    TABLE(leave_requests, "leave_requests") {
+        PK(id) BIGINT AUTO_INCREMENT
+        FK(employee_id) BIGINT NOT NULL
+        NN(type) VARCHAR(50) NOT NULL
+        NN(start_date) DATE NOT NULL
+        NN(end_date) DATE NOT NULL
+        NN(total_days) DECIMAL(5,2) NOT NULL
+        reason VARCHAR(255)
+        NN(status) VARCHAR(50) NOT NULL
+        FK(approver_id) BIGINT
+        decided_at DATETIME
+    }
+
+    TABLE(employees, "employees") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(full_name) VARCHAR(150) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        phone VARCHAR(30)
+        department VARCHAR(100)
+        position VARCHAR(100)
+        NN(hire_date) DATE NOT NULL
+        termination_date DATE
+        employment_status VARCHAR(50)
+        base_salary DECIMAL(12,2)
+        FK(manager_id) BIGINT
+        FK(user_id) BIGINT
+    }
+}
+
+' Relationships
+employees ||--o{ leave_requests : "employee_id"
+employees ||--o{ leave_requests : "approver_id"
+
+note right of leave_requests
+  **Leave Request**
+  - Đơn xin nghỉ phép của nhân viên
+  - Hỗ trợ nhiều loại nghỉ: ANNUAL, SICK, UNPAID, MATERNITY, PATERNITY, COMPENSATORY, OTHER
+  - Trạng thái: PENDING, APPROVED, REJECTED, CANCELLED
+  - Tự động tính số ngày nghỉ
+  - Quy trình phê duyệt với approver
+end note
+
+note right of employees
+  **Employee Reference**
+  - Thông tin nhân viên tạo đơn nghỉ
+  - Người duyệt đơn (approver)
+  - Liên kết 1-nhiều với leave_requests
+end note
+@enduml
+
