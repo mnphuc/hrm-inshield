@@ -1,0 +1,66 @@
+@startuml
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PK(x) <b><color:#b8861b><&key></color> x</b>
+!define FK(x) <color:#aaaaaa></color> x
+!define NN(x) <color:#ef4444></color> x
+!define UQ(x) <color:#3b82f6></color> x
+
+package "Equipment Management" {
+    TABLE(equipment, "equipment") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(name) VARCHAR(150) NOT NULL
+        type VARCHAR(100)
+        serial_number VARCHAR(100)
+        NN(status) VARCHAR(50) NOT NULL
+        purchase_date DATE
+        purchase_price DECIMAL(12,2)
+        notes VARCHAR(500)
+        FK(assigned_to_employee_id) BIGINT
+    }
+
+    TABLE(employees, "employees") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(full_name) VARCHAR(150) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        phone VARCHAR(30)
+        department VARCHAR(100)
+        position VARCHAR(100)
+        NN(hire_date) DATE NOT NULL
+        termination_date DATE
+        employment_status VARCHAR(50)
+        base_salary DECIMAL(12,2)
+        FK(manager_id) BIGINT
+        FK(user_id) BIGINT
+    }
+}
+
+' Relationships
+equipment ||--o| employees : "assigned_to_employee_id"
+
+note right of equipment
+  **Equipment Entity**
+  - Quản lý tài sản/thiết bị công ty
+  - Hỗ trợ phân bổ cho nhân viên
+  - Theo dõi trạng thái thiết bị
+  - Lưu trữ thông tin mua sắm và bảo trì
+end note
+
+note right of employees
+  **Employee Reference**
+  - Nhân viên được phân bổ thiết bị
+  - Liên kết 1-nhiều với equipment
+  - Hỗ trợ báo cáo thiết bị theo nhân viên
+end note
+
+note bottom of equipment
+  **Equipment Status:**
+  - AVAILABLE: Có sẵn
+  - ASSIGNED: Đã phân bổ
+  - MAINTENANCE: Bảo trì
+  - BROKEN: Hỏng
+  - RETIRED: Đã nghỉ hưu
+end note
+@enduml
+

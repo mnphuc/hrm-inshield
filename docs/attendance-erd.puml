@@ -1,0 +1,54 @@
+@startuml
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PK(x) <b><color:#b8861b><&key></color> x</b>
+!define FK(x) <color:#aaaaaa></color> x
+!define NN(x) <color:#ef4444></color> x
+!define UQ(x) <color:#3b82f6></color> x
+
+package "Attendance Management" {
+    TABLE(attendance_records, "attendance_records") {
+        PK(id) BIGINT AUTO_INCREMENT
+        FK(employee_id) BIGINT NOT NULL
+        NN(work_date) DATE NOT NULL
+        check_in TIME
+        check_out TIME
+        worked_hours DECIMAL(5,2)
+        notes VARCHAR(255)
+    }
+
+    TABLE(employees, "employees") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(full_name) VARCHAR(150) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        phone VARCHAR(30)
+        department VARCHAR(100)
+        position VARCHAR(100)
+        NN(hire_date) DATE NOT NULL
+        termination_date DATE
+        employment_status VARCHAR(50)
+        base_salary DECIMAL(12,2)
+        FK(manager_id) BIGINT
+        FK(user_id) BIGINT
+    }
+}
+
+' Relationships
+attendance_records ||--|| employees : "employee_id"
+
+note right of attendance_records
+  **Attendance Record**
+  - Ghi nhận chấm công hàng ngày
+  - Tự động tính số giờ làm việc
+  - Hỗ trợ ghi chú và trạng thái
+  - Unique constraint: (employee_id, work_date)
+end note
+
+note right of employees
+  **Employee Reference**
+  - Thông tin nhân viên để chấm công
+  - Liên kết 1-nhiều với attendance_records
+  - Hỗ trợ báo cáo theo nhân viên
+end note
+@enduml
+

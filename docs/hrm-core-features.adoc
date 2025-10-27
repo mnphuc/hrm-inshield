@@ -1,0 +1,748 @@
+= Tài liệu Chức năng Cốt lõi HRM InShield
+:author: TechShield Development Team
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums:
+:imagesdir: images
+:plantuml-server-url: https://www.plantuml.com/plantuml/svg/
+:source-highlighter: highlight.js
+:icons: font
+:experimental:
+
+== Giới thiệu
+
+=== Tổng quan hệ thống HRM InShield
+
+HRM InShield là hệ thống quản lý nhân sự toàn diện được phát triển bằng Spring Boot, cung cấp các chức năng quản lý nhân viên, chấm công, đối tác và tài sản. Hệ thống được thiết kế với kiến trúc MVC hiện đại, hỗ trợ phân quyền người dùng và giao diện web thân thiện.
+
+=== Mục đích tài liệu
+
+Tài liệu này mô tả chi tiết 4 chức năng cốt lõi của hệ thống HRM InShield:
+
+* Quản lý Nhân viên (Employee Management)
+* Chấm công (Attendance Management) 
+* Quản lý Đối tác (Partner Management)
+* Quản lý Tài sản (Equipment Management)
+
+Mỗi chức năng bao gồm: khảo sát hệ thống, kịch bản sử dụng, biểu đồ thực thể, thiết kế cơ sở dữ liệu và giao diện người dùng.
+
+=== Phạm vi tài liệu
+
+Tài liệu tập trung vào:
+
+* Kiến trúc và công nghệ sử dụng
+* Luồng xử lý nghiệp vụ (Business Process)
+* Thiết kế cơ sở dữ liệu
+* Giao diện người dùng
+* Biểu đồ sequence và ERD
+
+== Chức năng Quản lý Nhân viên
+
+=== Khảo sát hệ thống
+
+==== Kiến trúc hệ thống
+
+Hệ thống HRM InShield được xây dựng trên nền tảng Spring Boot với kiến trúc MVC:
+
+* **Backend**: Spring Boot 3.x, Spring Security, Spring Data JPA
+* **Frontend**: Thymeleaf templates, Bootstrap CSS, JavaScript
+* **Database**: MariaDB với Liquibase migration
+* **Authentication**: Spring Security với role-based access control
+
+==== Công nghệ sử dụng
+
+[cols="1,2,1"]
+|===
+|Công nghệ |Mô tả |Phiên bản
+
+|Spring Boot
+|Framework chính cho backend
+|3.x
+
+|Spring Security
+|Xác thực và phân quyền
+|6.x
+
+|Spring Data JPA
+|ORM và truy vấn database
+|3.x
+
+|Thymeleaf
+|Template engine cho frontend
+|3.x
+
+|MariaDB
+|Hệ quản trị cơ sở dữ liệu
+|10.x
+
+|Liquibase
+|Database migration tool
+|4.x
+
+|Bootstrap
+|CSS framework cho UI
+|5.x
+|===
+
+=== Kịch bản sử dụng
+
+==== Use Case 1: Xem danh sách nhân viên
+
+**Mô tả**: HR/Admin xem danh sách tất cả nhân viên trong hệ thống
+
+**Luồng thực hiện**:
+1. Người dùng đăng nhập vào hệ thống
+2. Truy cập menu "Nhân viên"
+3. Hệ thống hiển thị danh sách nhân viên với phân trang
+4. Người dùng có thể tìm kiếm và lọc theo điều kiện
+
+**Kết quả**: Danh sách nhân viên được hiển thị với thông tin cơ bản
+
+==== Use Case 2: Thêm nhân viên mới
+
+**Mô tả**: HR/Admin thêm nhân viên mới vào hệ thống
+
+**Luồng thực hiện**:
+1. Click nút "Thêm nhân viên"
+2. Điền form thông tin nhân viên:
+   - Thông tin cơ bản: Mã, Họ tên, Email, Điện thoại
+   - Thông tin công việc: Phòng ban, Chức vụ, Ngày vào làm, Lương
+   - Thông tin quản lý: Quản lý trực tiếp, Tài khoản liên kết
+   - Phân quyền: Chọn roles (ADMIN, HR, MANAGER, EMPLOYEE)
+3. Click "Lưu"
+4. Hệ thống tạo tài khoản đăng nhập (nếu có email)
+5. Gửi email thông tin tài khoản cho nhân viên
+
+**Kết quả**: Nhân viên mới được tạo và có tài khoản đăng nhập
+
+==== Use Case 3: Cập nhật thông tin nhân viên
+
+**Mô tả**: HR/Admin chỉnh sửa thông tin nhân viên hiện có
+
+**Luồng thực hiện**:
+1. Click "Chỉnh sửa" trên nhân viên cần sửa
+2. Cập nhật thông tin trong form
+3. Click "Lưu"
+4. Hệ thống cập nhật thông tin
+
+**Kết quả**: Thông tin nhân viên được cập nhật
+
+==== Use Case 4: Xóa nhân viên
+
+**Mô tả**: HR/Admin xóa nhân viên khỏi hệ thống
+
+**Luồng thực hiện**:
+1. Click "Xóa" trên nhân viên cần xóa
+2. Xác nhận xóa
+3. Hệ thống xóa nhân viên và tài khoản liên kết
+
+**Kết quả**: Nhân viên bị xóa khỏi hệ thống
+
+=== Biểu đồ Sequence
+
+==== Luồng xem danh sách nhân viên
+
+[plantuml, employee-list-sequence, svg]
+----
+include::employee_sequence.puml[format=svg]
+----
+
+==== Luồng thêm nhân viên với tài khoản
+
+[plantuml, employee-add-sequence, svg]
+----
+include::add-employee-sequence.puml[]
+----
+
+=== Biểu đồ Thực thể (ERD)
+
+[plantuml, employee-erd, svg]
+....
+include::employee-erd.puml[]
+....
+
+=== Thiết kế Cơ sở Dữ liệu
+
+==== Bảng employees
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|code
+|VARCHAR(50)
+|NOT NULL, UNIQUE
+|Mã nhân viên (EMP-001)
+
+|full_name
+|VARCHAR(150)
+|NOT NULL
+|Họ và tên đầy đủ
+
+|email
+|VARCHAR(150)
+|NOT NULL, UNIQUE
+|Email liên hệ
+
+|phone
+|VARCHAR(30)
+|NULL
+|Số điện thoại
+
+|department
+|VARCHAR(100)
+|NULL
+|Phòng ban
+
+|position
+|VARCHAR(100)
+|NULL
+|Chức vụ
+
+|hire_date
+|DATE
+|NOT NULL
+|Ngày vào làm
+
+|termination_date
+|DATE
+|NULL
+|Ngày nghỉ việc
+
+|employment_status
+|VARCHAR(50)
+|NULL
+|Trạng thái làm việc
+
+|base_salary
+|DECIMAL(12,2)
+|NULL
+|Lương cơ bản
+
+|manager_id
+|BIGINT
+|FK
+|ID quản lý trực tiếp
+
+|user_id
+|BIGINT
+|FK
+|ID tài khoản đăng nhập
+|===
+
+==== Bảng users
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|username
+|VARCHAR(100)
+|NOT NULL, UNIQUE
+|Tên đăng nhập
+
+|email
+|VARCHAR(150)
+|NOT NULL, UNIQUE
+|Email đăng nhập
+
+|password
+|VARCHAR(255)
+|NOT NULL
+|Mật khẩu (mã hóa)
+
+|enabled
+|BOOLEAN
+|NOT NULL, DEFAULT true
+|Tài khoản có hoạt động
+
+|account_non_locked
+|BOOLEAN
+|NOT NULL, DEFAULT true
+|Tài khoản có bị khóa
+
+|last_login_at
+|TIMESTAMP
+|NULL
+|Lần đăng nhập cuối
+|===
+
+==== Bảng roles
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|name
+|VARCHAR(50)
+|NOT NULL, UNIQUE
+|Tên vai trò (ADMIN, HR, MANAGER, EMPLOYEE)
+|===
+
+==== Bảng user_roles
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|user_id
+|BIGINT
+|PK, FK
+|ID người dùng
+
+|role_id
+|BIGINT
+|PK, FK
+|ID vai trò
+|===
+
+=== Giao diện Người dùng
+
+==== Màn hình Dashboard
+
+image::dashboard.png[Dashboard HRM InShield, width=100%]
+
+==== Màn hình Danh sách Nhân viên
+
+image::employee-list.png[Danh sách nhân viên, width=100%]
+
+==== Màn hình Form Thêm Nhân viên
+
+image::employee-form.png[Form thêm nhân viên, width=100%]
+
+== Chức năng Chấm công
+
+=== Khảo sát hệ thống
+
+Chức năng chấm công cho phép quản lý thời gian làm việc của nhân viên, bao gồm:
+
+* Ghi nhận giờ vào/ra
+* Tính toán số giờ làm việc tự động
+* Theo dõi lịch sử chấm công
+* Báo cáo thời gian làm việc
+
+=== Kịch bản sử dụng
+
+==== Use Case 1: Ghi nhận chấm công
+
+**Mô tả**: HR/Admin ghi nhận chấm công cho nhân viên
+
+**Luồng thực hiện**:
+1. Truy cập menu "Chấm công"
+2. Click "Thêm chấm công"
+3. Chọn nhân viên từ dropdown
+4. Nhập ngày làm việc
+5. Nhập giờ vào và giờ ra
+6. Hệ thống tự động tính số giờ làm việc
+7. Thêm ghi chú (tùy chọn)
+8. Click "Lưu"
+
+**Kết quả**: Bản ghi chấm công được tạo
+
+==== Use Case 2: Xem lịch sử chấm công
+
+**Mô tả**: HR/Admin xem lịch sử chấm công của nhân viên
+
+**Luồng thực hiện**:
+1. Truy cập danh sách chấm công
+2. Xem thông tin: Nhân viên, Ngày, Giờ vào/ra, Số giờ
+3. Có thể lọc theo nhân viên hoặc khoảng thời gian
+
+**Kết quả**: Hiển thị lịch sử chấm công
+
+==== Use Case 3: Chỉnh sửa chấm công
+
+**Mô tả**: HR/Admin chỉnh sửa thông tin chấm công
+
+**Luồng thực hiện**:
+1. Click "Chỉnh sửa" trên bản ghi cần sửa
+2. Cập nhật thông tin
+3. Click "Lưu"
+
+**Kết quả**: Thông tin chấm công được cập nhật
+
+=== Biểu đồ Sequence
+
+[plantuml, attendance-sequence, svg]
+....
+include::attendance-sequence.puml[]
+....
+
+=== Biểu đồ Thực thể (ERD)
+
+[plantuml, attendance-erd, svg]
+....
+include::attendance-erd.puml[]
+....
+
+=== Thiết kế Cơ sở Dữ liệu
+
+==== Bảng attendance_records
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|employee_id
+|BIGINT
+|NOT NULL, FK
+|ID nhân viên
+
+|work_date
+|DATE
+|NOT NULL
+|Ngày làm việc
+
+|check_in
+|TIME
+|NULL
+|Giờ vào làm
+
+|check_out
+|TIME
+|NULL
+|Giờ ra về
+
+|worked_hours
+|DECIMAL(5,2)
+|NULL
+|Số giờ làm việc
+
+|notes
+|VARCHAR(255)
+|NULL
+|Ghi chú
+|===
+
+**Ràng buộc đặc biệt**:
+- Unique constraint: (employee_id, work_date) - Mỗi nhân viên chỉ có 1 bản ghi chấm công/ngày
+
+=== Giao diện Người dùng
+
+==== Màn hình Danh sách Chấm công
+
+image::attendance-list.png[Danh sách chấm công, width=100%]
+
+==== Màn hình Form Thêm Chấm công
+
+image::attendance-form.png[Form thêm chấm công, width=100%]
+
+== Chức năng Quản lý Đối tác
+
+=== Khảo sát hệ thống
+
+Chức năng quản lý đối tác cho phép:
+
+* Quản lý thông tin đối tác (nhà cung cấp, khách hàng, nhà phân phối)
+* Phân loại và quản lý trạng thái đối tác
+* Tìm kiếm và lọc đối tác
+* Theo dõi lịch sử hợp tác
+
+=== Kịch bản sử dụng
+
+==== Use Case 1: Thêm đối tác mới
+
+**Mô tả**: HR/Admin thêm đối tác mới vào hệ thống
+
+**Luồng thực hiện**:
+1. Truy cập menu "Đối tác"
+2. Click "Thêm đối tác"
+3. Điền thông tin:
+   - Mã đối tác (PART-001)
+   - Tên đối tác
+   - Email, Số điện thoại, Địa chỉ
+   - Loại đối tác (Nhà cung cấp, Khách hàng, Nhà phân phối, Khác)
+   - Trạng thái (Hoạt động, Không hoạt động, Tạm dừng)
+   - Ngày bắt đầu hợp tác
+   - Ghi chú
+4. Click "Lưu"
+
+**Kết quả**: Đối tác mới được tạo
+
+==== Use Case 2: Quản lý danh sách đối tác
+
+**Mô tả**: HR/Admin xem và quản lý danh sách đối tác
+
+**Luồng thực hiện**:
+1. Xem danh sách đối tác
+2. Sử dụng bộ lọc:
+   - Tìm theo tên
+   - Lọc theo trạng thái
+   - Lọc theo loại đối tác
+3. Chỉnh sửa hoặc xóa đối tác
+
+**Kết quả**: Quản lý hiệu quả danh sách đối tác
+
+=== Biểu đồ Sequence
+
+[plantuml, partner-sequence, svg]
+....
+include::partner-sequence.puml[]
+....
+
+=== Biểu đồ Thực thể (ERD)
+
+[plantuml, partner-erd, svg]
+....
+include::partner-erd.puml[]
+....
+
+=== Thiết kế Cơ sở Dữ liệu
+
+==== Bảng partners
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|code
+|VARCHAR(50)
+|NOT NULL, UNIQUE
+|Mã đối tác (PART-001)
+
+|name
+|VARCHAR(150)
+|NOT NULL
+|Tên đối tác
+
+|email
+|VARCHAR(150)
+|NULL
+|Email liên hệ
+
+|phone
+|VARCHAR(30)
+|NULL
+|Số điện thoại
+
+|address
+|VARCHAR(255)
+|NULL
+|Địa chỉ
+
+|partner_type
+|VARCHAR(50)
+|NOT NULL
+|Loại đối tác (SUPPLIER, CUSTOMER, DISTRIBUTOR, OTHER)
+
+|status
+|VARCHAR(50)
+|NOT NULL
+|Trạng thái (ACTIVE, INACTIVE, SUSPENDED)
+
+|start_date
+|DATE
+|NULL
+|Ngày bắt đầu hợp tác
+
+|notes
+|VARCHAR(500)
+|NULL
+|Ghi chú
+|===
+
+=== Giao diện Người dùng
+
+==== Màn hình Danh sách Đối tác
+
+image::partner-list.png[Danh sách đối tác, width=100%]
+
+==== Màn hình Form Thêm Đối tác
+
+image::partner-form.png[Form thêm đối tác, width=100%]
+
+== Chức năng Quản lý Tài sản
+
+=== Khảo sát hệ thống
+
+Chức năng quản lý tài sản cho phép:
+
+* Quản lý thông tin thiết bị/tài sản công ty
+* Phân bổ thiết bị cho nhân viên
+* Theo dõi trạng thái thiết bị
+* Quản lý lịch sử sử dụng
+
+=== Kịch bản sử dụng
+
+==== Use Case 1: Thêm thiết bị mới
+
+**Mô tả**: HR/Admin thêm thiết bị mới vào hệ thống
+
+**Luồng thực hiện**:
+1. Truy cập menu "Thiết bị"
+2. Click "Thêm thiết bị"
+3. Điền thông tin:
+   - Mã thiết bị (EQ-001)
+   - Tên thiết bị
+   - Loại thiết bị
+   - Số serial
+   - Trạng thái (Có sẵn, Đã phân bổ, Bảo trì, Hỏng, Đã nghỉ hưu)
+   - Ngày mua, Giá mua
+   - Ghi chú
+4. Click "Lưu"
+
+**Kết quả**: Thiết bị mới được tạo
+
+==== Use Case 2: Phân bổ thiết bị cho nhân viên
+
+**Mô tả**: HR/Admin phân bổ thiết bị cho nhân viên sử dụng
+
+**Luồng thực hiện**:
+1. Chọn thiết bị cần phân bổ
+2. Click "Phân bổ"
+3. Chọn nhân viên từ danh sách
+4. Xác nhận phân bổ
+5. Hệ thống cập nhật trạng thái thiết bị thành "Đã phân bổ"
+
+**Kết quả**: Thiết bị được phân bổ cho nhân viên
+
+==== Use Case 3: Thu hồi thiết bị
+
+**Mô tả**: HR/Admin thu hồi thiết bị từ nhân viên
+
+**Luồng thực hiện**:
+1. Chọn thiết bị đã phân bổ
+2. Click "Thu hồi"
+3. Xác nhận thu hồi
+4. Hệ thống cập nhật trạng thái thiết bị thành "Có sẵn"
+
+**Kết quả**: Thiết bị được thu hồi và có thể phân bổ lại
+
+=== Biểu đồ Sequence
+
+[plantuml, equipment-sequence, svg]
+....
+include::equipment-sequence.puml[]
+....
+
+=== Biểu đồ Thực thể (ERD)
+
+[plantuml, equipment-erd, svg]
+....
+include::equipment-erd.puml[]
+....
+
+=== Thiết kế Cơ sở Dữ liệu
+
+==== Bảng equipment
+
+[cols="1,2,1,1,3"]
+|===
+|Cột |Kiểu dữ liệu |Ràng buộc |Mô tả
+
+|id
+|BIGINT AUTO_INCREMENT
+|PK
+|Khóa chính
+
+|code
+|VARCHAR(50)
+|NOT NULL, UNIQUE
+|Mã thiết bị (EQ-001)
+
+|name
+|VARCHAR(150)
+|NOT NULL
+|Tên thiết bị
+
+|type
+|VARCHAR(100)
+|NULL
+|Loại thiết bị
+
+|serial_number
+|VARCHAR(100)
+|NULL
+|Số serial
+
+|status
+|VARCHAR(50)
+|NOT NULL
+|Trạng thái (AVAILABLE, ASSIGNED, MAINTENANCE, BROKEN, RETIRED)
+
+|purchase_date
+|DATE
+|NULL
+|Ngày mua
+
+|purchase_price
+|DECIMAL(12,2)
+|NULL
+|Giá mua
+
+|notes
+|VARCHAR(500)
+|NULL
+|Ghi chú
+
+|assigned_to_employee_id
+|BIGINT
+|FK
+|ID nhân viên được phân bổ
+|===
+
+=== Giao diện Người dùng
+
+==== Màn hình Danh sách Thiết bị
+
+image::equipment-list.png[Danh sách thiết bị, width=100%]
+
+==== Màn hình Form Thêm Thiết bị
+
+image::equipment-form.png[Form thêm thiết bị, width=100%]
+
+== Kết luận
+
+Tài liệu này đã mô tả chi tiết 4 chức năng cốt lõi của hệ thống HRM InShield:
+
+* **Quản lý Nhân viên**: Quản lý thông tin nhân viên, tạo tài khoản, phân quyền
+* **Chấm công**: Ghi nhận thời gian làm việc, tính toán giờ công
+* **Quản lý Đối tác**: Quản lý thông tin đối tác, phân loại và trạng thái
+* **Quản lý Tài sản**: Quản lý thiết bị, phân bổ và thu hồi
+
+Mỗi chức năng được thiết kế với kiến trúc rõ ràng, luồng xử lý logic và giao diện thân thiện với người dùng. Hệ thống sử dụng các công nghệ hiện đại và tuân thủ các nguyên tắc thiết kế phần mềm tốt.
+
+=== Công nghệ và Kiến trúc
+
+Hệ thống được xây dựng trên nền tảng Spring Boot với:
+
+* **Backend**: Spring Boot, Spring Security, Spring Data JPA
+* **Frontend**: Thymeleaf, Bootstrap
+* **Database**: MariaDB với Liquibase migration
+* **Security**: Role-based access control
+
+=== Hướng phát triển
+
+Hệ thống có thể được mở rộng với các chức năng:
+
+* Báo cáo và thống kê nâng cao
+* Tích hợp API với hệ thống khác
+* Mobile app cho nhân viên
+* Workflow approval cho các quy trình
+* Analytics và Business Intelligence

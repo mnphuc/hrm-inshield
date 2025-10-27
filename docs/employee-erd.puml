@@ -1,0 +1,73 @@
+@startuml
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PK(x) <b><color:#b8861b><&key></color> x</b>
+!define FK(x) <color:#aaaaaa></color> x
+!define NN(x) <color:#ef4444></color> x
+!define UQ(x) <color:#3b82f6></color> x
+
+package "Employee Management" {
+    TABLE(employees, "employees") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(full_name) VARCHAR(150) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        phone VARCHAR(30)
+        department VARCHAR(100)
+        position VARCHAR(100)
+        NN(hire_date) DATE NOT NULL
+        termination_date DATE
+        employment_status VARCHAR(50)
+        base_salary DECIMAL(12,2)
+        FK(manager_id) BIGINT
+        FK(user_id) BIGINT
+    }
+
+    TABLE(users, "users") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(username) VARCHAR(100) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        NN(password) VARCHAR(255) NOT NULL
+        NN(enabled) BOOLEAN DEFAULT true
+        NN(account_non_locked) BOOLEAN DEFAULT true
+        last_login_at TIMESTAMP
+    }
+
+    TABLE(roles, "roles") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(name) VARCHAR(50) NOT NULL
+    }
+
+    TABLE(user_roles, "user_roles") {
+        PK(user_id) BIGINT NOT NULL
+        PK(role_id) BIGINT NOT NULL
+    }
+}
+
+' Relationships
+employees ||--o{ employees : "manager_id"
+employees ||--o| users : "user_id"
+users ||--o{ user_roles : "user_id"
+roles ||--o{ user_roles : "role_id"
+
+note right of employees
+  **Employee Entity**
+  - Quản lý thông tin nhân viên
+  - Liên kết với tài khoản người dùng
+  - Hỗ trợ cấu trúc phân cấp quản lý
+end note
+
+note right of users
+  **User Account**
+  - Tài khoản đăng nhập hệ thống
+  - Hỗ trợ xác thực và phân quyền
+  - Liên kết với thông tin nhân viên
+end note
+
+note right of roles
+  **Role Management**
+  - Định nghĩa các vai trò trong hệ thống
+  - Hỗ trợ phân quyền chi tiết
+  - Liên kết nhiều-nhiều với users
+end note
+@enduml
+

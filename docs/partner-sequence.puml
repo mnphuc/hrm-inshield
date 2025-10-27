@@ -1,0 +1,62 @@
+@startuml
+actor "Người dùng (HR/Admin)" as User
+participant "Giao diện Quản lý Đối tác" as View
+participant "PartnerController" as Controller
+participant "PartnerService" as Service
+participant "CSDL (PartnerRepository)" as DB
+
+== Xem danh sách đối tác ==
+User -> View: Mở trang Quản lý Đối tác
+View -> Controller: GET /cms/partners
+Controller -> Service: Lấy danh sách đối tác (có lọc)
+Service -> DB: Truy vấn dữ liệu đối tác với filters
+DB --> Service: Danh sách đối tác
+Service --> Controller: Danh sách PartnerResponse
+Controller -> View: Render giao diện danh sách
+User <- View: Hiển thị danh sách đối tác
+
+== Thêm đối tác ==
+User -> View: Nhập thông tin đối tác mới
+View -> Controller: POST /cms/partners (PartnerRequest)
+Controller -> Service: Gọi hàm create(request)
+Service -> Service: Kiểm tra và ánh xạ dữ liệu (validate + mapping)
+Service -> DB: Lưu đối tác mới vào CSDL
+DB --> Service: Trả về đối tượng đối tác đã lưu
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Reload danh sách + hiển thị thông báo "Thêm mới thành công"
+User <- View: Xem danh sách có đối tác mới
+
+== Cập nhật đối tác ==
+User -> View: Chọn chỉnh sửa thông tin đối tác
+View -> Controller: POST /cms/partners/{id}/update (PartnerRequest)
+Controller -> Service: Gọi hàm update(id, request)
+Service -> DB: Tìm đối tác theo ID
+DB --> Service: Trả về thông tin đối tác
+Service -> Service: Cập nhật thông tin mới vào entity
+Service -> DB: Ghi lại thông tin đã cập nhật
+DB --> Service: Xác nhận thành công
+Service --> Controller: Thông báo cập nhật thành công
+Controller -> View: Cập nhật lại danh sách
+User <- View: Xem danh sách đã thay đổi
+
+== Xóa đối tác ==
+User -> View: Chọn xóa đối tác
+View -> Controller: POST /cms/partners/{id}/delete
+Controller -> Service: Gọi hàm delete(id)
+Service -> DB: Xóa bản ghi đối tác
+DB --> Service: Xác nhận xóa thành công
+Service --> Controller: Thông báo xóa thành công
+Controller -> View: Cập nhật lại danh sách đối tác
+User <- View: Danh sách sau khi xóa
+
+== Lọc đối tác ==
+User -> View: Nhập điều kiện lọc (tên, trạng thái, loại)
+View -> Controller: GET /cms/partners?filters
+Controller -> Service: Gọi hàm findByFilters(filters)
+Service -> DB: Truy vấn với điều kiện lọc
+DB --> Service: Kết quả lọc
+Service --> Controller: Danh sách đối tác đã lọc
+Controller -> View: Hiển thị kết quả lọc
+User <- View: Danh sách đối tác theo điều kiện
+@enduml
+

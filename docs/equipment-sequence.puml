@@ -1,0 +1,90 @@
+@startuml
+actor "Người dùng (HR/Admin)" as User
+participant "Giao diện Quản lý Thiết bị" as View
+participant "EquipmentController" as Controller
+participant "EquipmentService" as Service
+participant "CSDL (EquipmentRepository)" as DB
+participant "EmployeeRepository" as EmpRepo
+
+== Xem danh sách thiết bị ==
+User -> View: Mở trang Quản lý Thiết bị
+View -> Controller: GET /cms/equipment
+Controller -> Service: Lấy danh sách thiết bị (có lọc)
+Service -> DB: Truy vấn dữ liệu thiết bị với filters
+DB --> Service: Danh sách thiết bị
+Service --> Controller: Danh sách EquipmentResponse
+Controller -> View: Render giao diện danh sách
+User <- View: Hiển thị danh sách thiết bị
+
+== Thêm thiết bị ==
+User -> View: Nhập thông tin thiết bị mới
+View -> Controller: POST /cms/equipment (EquipmentRequest)
+Controller -> Service: Gọi hàm create(request)
+Service -> Service: Kiểm tra và ánh xạ dữ liệu (validate + mapping)
+Service -> DB: Lưu thiết bị mới vào CSDL
+DB --> Service: Trả về đối tượng thiết bị đã lưu
+Service --> Controller: Trả thông báo thành công
+Controller -> View: Reload danh sách + hiển thị thông báo "Thêm mới thành công"
+User <- View: Xem danh sách có thiết bị mới
+
+== Cập nhật thiết bị ==
+User -> View: Chọn chỉnh sửa thông tin thiết bị
+View -> Controller: POST /cms/equipment/{id}/update (EquipmentRequest)
+Controller -> Service: Gọi hàm update(id, request)
+Service -> DB: Tìm thiết bị theo ID
+DB --> Service: Trả về thông tin thiết bị
+Service -> Service: Cập nhật thông tin mới vào entity
+Service -> DB: Ghi lại thông tin đã cập nhật
+DB --> Service: Xác nhận thành công
+Service --> Controller: Thông báo cập nhật thành công
+Controller -> View: Cập nhật lại danh sách
+User <- View: Xem danh sách đã thay đổi
+
+== Phân bổ thiết bị cho nhân viên ==
+User -> View: Chọn thiết bị và nhân viên để phân bổ
+View -> Controller: POST /cms/equipment/{id}/assign (AssignEquipmentRequest)
+Controller -> Service: Gọi hàm assignToEmployee(id, request)
+Service -> DB: Tìm thiết bị theo ID
+DB --> Service: Trả về thiết bị
+Service -> EmpRepo: Tìm nhân viên theo ID
+EmpRepo --> Service: Trả về nhân viên
+Service -> Service: Cập nhật thiết bị (assignedTo, status = ASSIGNED)
+Service -> DB: Lưu thay đổi
+DB --> Service: Xác nhận thành công
+Service --> Controller: Thông báo phân bổ thành công
+Controller -> View: Cập nhật trạng thái thiết bị
+User <- View: Xem thiết bị đã được phân bổ
+
+== Thu hồi thiết bị ==
+User -> View: Chọn thu hồi thiết bị
+View -> Controller: POST /cms/equipment/{id}/unassign
+Controller -> Service: Gọi hàm unassign(id)
+Service -> DB: Tìm thiết bị theo ID
+DB --> Service: Trả về thiết bị
+Service -> Service: Cập nhật thiết bị (assignedTo = null, status = AVAILABLE)
+Service -> DB: Lưu thay đổi
+DB --> Service: Xác nhận thành công
+Service --> Controller: Thông báo thu hồi thành công
+Controller -> View: Cập nhật trạng thái thiết bị
+User <- View: Xem thiết bị đã được thu hồi
+
+== Xóa thiết bị ==
+User -> View: Chọn xóa thiết bị
+View -> Controller: POST /cms/equipment/{id}/delete
+Controller -> Service: Gọi hàm delete(id)
+Service -> DB: Xóa bản ghi thiết bị
+DB --> Service: Xác nhận xóa thành công
+Service --> Controller: Thông báo xóa thành công
+Controller -> View: Cập nhật lại danh sách thiết bị
+User <- View: Danh sách sau khi xóa
+
+== Lọc thiết bị ==
+User -> View: Nhập điều kiện lọc (tên, trạng thái, loại)
+View -> Controller: GET /cms/equipment?filters
+Controller -> Service: Gọi hàm findByFilters(filters)
+Service -> DB: Truy vấn với điều kiện lọc
+DB --> Service: Kết quả lọc
+Service --> Controller: Danh sách thiết bị đã lọc
+Controller -> View: Hiển thị kết quả lọc
+User <- View: Danh sách thiết bị theo điều kiện
+@enduml

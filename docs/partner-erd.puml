@@ -1,0 +1,44 @@
+@startuml
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PK(x) <b><color:#b8861b><&key></color> x</b>
+!define FK(x) <color:#aaaaaa></color> x
+!define NN(x) <color:#ef4444></color> x
+!define UQ(x) <color:#3b82f6></color> x
+
+package "Partner Management" {
+    TABLE(partners, "partners") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(name) VARCHAR(150) NOT NULL
+        email VARCHAR(150)
+        phone VARCHAR(30)
+        address VARCHAR(255)
+        NN(partner_type) VARCHAR(50) NOT NULL
+        NN(status) VARCHAR(50) NOT NULL
+        start_date DATE
+        notes VARCHAR(500)
+    }
+}
+
+note right of partners
+  **Partner Entity**
+  - Quản lý thông tin đối tác
+  - Hỗ trợ phân loại đối tác (Nhà cung cấp, Khách hàng, Nhà phân phối, Khác)
+  - Quản lý trạng thái (Hoạt động, Không hoạt động, Tạm dừng)
+  - Lưu trữ thông tin liên hệ và ghi chú
+end note
+
+note bottom of partners
+  **Partner Types:**
+  - SUPPLIER: Nhà cung cấp
+  - CUSTOMER: Khách hàng  
+  - DISTRIBUTOR: Nhà phân phối
+  - OTHER: Khác
+  
+  **Status Values:**
+  - ACTIVE: Hoạt động
+  - INACTIVE: Không hoạt động
+  - SUSPENDED: Tạm dừng
+end note
+@enduml
+
