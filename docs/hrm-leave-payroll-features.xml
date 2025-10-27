@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?asciidoc-toc maxdepth="3"?>
+<?asciidoc-numbered?>
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<info>
+<title>Tài liệu Chức năng Quản lý Nghỉ phép và Bảng lương HRM InShield</title>
+<date>2025-10-27</date>
+<author>
+<personname>
+<firstname>TechShield</firstname>
+<othername>Development</othername>
+<surname>Team</surname>
+</personname>
+</author>
+<authorinitials>TDT</authorinitials>
+</info>
+<chapter xml:id="_giới_thiệu">
+<title>Giới thiệu</title>
+<section xml:id="_tổng_quan_các_chức_năng">
+<title>Tổng quan các chức năng</title>
+<simpara>Tài liệu này mô tả chi tiết 2 chức năng quản lý quan trọng của hệ thống HRM InShield:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Quản lý Nghỉ phép (Leave Management)</simpara>
+</listitem>
+<listitem>
+<simpara>Quản lý Bảng lương (Payroll Management)</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Mỗi chức năng bao gồm: khảo sát hệ thống, kịch bản sử dụng, biểu đồ thực thể, thiết kế cơ sở dữ liệu và giao diện người dùng.</simpara>
+</section>
+<section xml:id="_mục_đích_tài_liệu">
+<title>Mục đích tài liệu</title>
+<simpara>Tài liệu này cung cấp:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Mô tả chi tiết các chức năng quản lý nghỉ phép và bảng lương</simpara>
+</listitem>
+<listitem>
+<simpara>Luồng xử lý nghiệp vụ từng chức năng</simpara>
+</listitem>
+<listitem>
+<simpara>Thiết kế cơ sở dữ liệu và biểu đồ ERD</simpara>
+</listitem>
+<listitem>
+<simpara>Hướng dẫn sử dụng giao diện người dùng</simpara>
+</listitem>
+</itemizedlist>
+</section>
+</chapter>
+<chapter xml:id="_chức_năng_quản_lý_nghỉ_phép">
+<title>Chức năng Quản lý Nghỉ phép</title>
+<section xml:id="_khảo_sát_hệ_thống">
+<title>Khảo sát hệ thống</title>
+<section xml:id="_kiến_trúc_hệ_thống">
+<title>Kiến trúc hệ thống</title>
+<simpara>Hệ thống quản lý nghỉ phép được xây dựng trên nền tảng Spring Boot với kiến trúc MVC:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><emphasis role="strong">Backend</emphasis>: Spring Boot 3.x, Spring Data JPA, Spring Security</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Frontend</emphasis>: Thymeleaf templates, Bootstrap CSS</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Database</emphasis>: MariaDB với Liquibase migration</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Authentication</emphasis>: Spring Security với role-based access control</simpara>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_công_nghệ_sử_dụng">
+<title>Công nghệ sử dụng</title>
+<informaltable frame="all" rowsep="1" colsep="1">
+<tgroup cols="3">
+<colspec colname="col_1" colwidth="25*"/>
+<colspec colname="col_2" colwidth="50*"/>
+<colspec colname="col_3" colwidth="25*"/>
+<thead>
+<row>
+<entry align="left" valign="top">Công nghệ</entry>
+<entry align="left" valign="top">Mô tả</entry>
+<entry align="left" valign="top">Phiên bản</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry align="left" valign="top"><simpara>Spring Boot</simpara></entry>
+<entry align="left" valign="top"><simpara>Framework chính cho backend</simpara></entry>
+<entry align="left" valign="top"><simpara>3.x</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Spring Data JPA</simpara></entry>
+<entry align="left" valign="top"><simpara>ORM và truy vấn database</simpara></entry>
+<entry align="left" valign="top"><simpara>3.x</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Thymeleaf</simpara></entry>
+<entry align="left" valign="top"><simpara>Template engine cho frontend</simpara></entry>
+<entry align="left" valign="top"><simpara>3.x</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>MariaDB</simpara></entry>
+<entry align="left" valign="top"><simpara>Hệ quản trị cơ sở dữ liệu</simpara></entry>
+<entry align="left" valign="top"><simpara>10.x</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Liquibase</simpara></entry>
+<entry align="left" valign="top"><simpara>Database migration tool</simpara></entry>
+<entry align="left" valign="top"><simpara>4.x</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Bootstrap</simpara></entry>
+<entry align="left" valign="top"><simpara>CSS framework cho UI</simpara></entry>
+<entry align="left" valign="top"><simpara>5.x</simpara></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+</section>
+</section>
+<section xml:id="_kịch_bản_sử_dụng">
+<title>Kịch bản sử dụng</title>
+<section xml:id="_use_case_1_gửi_đơn_xin_nghỉ_phép">
+<title>Use Case 1: Gửi đơn xin nghỉ phép</title>
+<simpara><emphasis role="strong">Mô tả</emphasis>: Nhân viên/HR/Admin tạo đơn xin nghỉ phép mới</simpara>
+<simpara><emphasis role="strong">Luồng thực hiện</emphasis>:
+1. Truy cập menu "Nghỉ phép"
+2. Điền form thông tin đơn nghỉ:
+   - Chọn nhân viên
+   - Chọn loại nghỉ (ANNUAL, SICK, UNPAID, MATERNITY, PATERNITY, COMPENSATORY, OTHER)
+   - Nhập ngày bắt đầu và ngày kết thúc
+   - Hệ thống tự động tính tổng số ngày
+   - Nhập lý do (tùy chọn)
+3. Click "Gửi đơn"
+4. Hệ thống tạo đơn nghỉ với trạng thái PENDING</simpara>
+<simpara><emphasis role="strong">Kết quả</emphasis>: Đơn nghỉ được tạo và chờ duyệt</simpara>
+</section>
+<section xml:id="_use_case_2_xem_danh_sách_đơn_nghỉ">
+<title>Use Case 2: Xem danh sách đơn nghỉ</title>
+<simpara><emphasis role="strong">Mô tả</emphasis>: HR/Admin xem danh sách tất cả đơn nghỉ phép</simpara>
+<simpara><emphasis role="strong">Luồng thực hiện</emphasis>:
+1. Truy cập menu "Nghỉ phép"
+2. Hệ thống hiển thị 2 bảng:
+   - <emphasis role="strong">Chờ duyệt</emphasis>: Các đơn chưa được xử lý
+   - <emphasis role="strong">Tất cả đơn</emphasis>: Lịch sử tất cả đơn nghỉ
+3. Xem thông tin: Nhân viên, Loại nghỉ, Thời gian, Trạng thái, Người duyệt</simpara>
+<simpara><emphasis role="strong">Kết quả</emphasis>: Danh sách đơn nghỉ được hiển thị</simpara>
+</section>
+<section xml:id="_use_case_3_duyệttừ_chối_đơn_nghỉ">
+<title>Use Case 3: Duyệt/Từ chối đơn nghỉ</title>
+<simpara><emphasis role="strong">Mô tả</emphasis>: HR/Manager/Admin cập nhật trạng thái đơn nghỉ</simpara>
+<simpara><emphasis role="strong">Luồng thực hiện</emphasis>:
+1. Chọn đơn nghỉ trong bảng "Chờ duyệt"
+2. Chọn trạng thái mới:
+   - APPROVED: Duyệt đơn
+   - REJECTED: Từ chối đơn
+   - CANCELLED: Hủy đơn
+3. Chọn người duyệt từ danh sách nhân viên
+4. Click "Cập nhật"
+5. Hệ thống cập nhật trạng thái và thời gian quyết định</simpara>
+<simpara><emphasis role="strong">Kết quả</emphasis>: Trạng thái đơn nghỉ được cập nhật</simpara>
+</section>
+<section xml:id="_use_case_4_xóa_đơn_nghỉ">
+<title>Use Case 4: Xóa đơn nghỉ</title>
+<simpara><emphasis role="strong">Mô tả</emphasis>: HR/Admin xóa đơn nghỉ khỏi hệ thống</simpara>
+<simpara><emphasis role="strong">Luồng thực hiện</emphasis>:
+1. Click "Xóa" trên đơn nghỉ cần xóa
+2. Xác nhận xóa
+3. Hệ thống xóa bản ghi khỏi cơ sở dữ liệu</simpara>
+<simpara><emphasis role="strong">Kết quả</emphasis>: Đơn nghỉ bị xóa khỏi hệ thống</simpara>
+</section>
+</section>
+<section xml:id="_biểu_đồ_sequence">
+<title>Biểu đồ Sequence</title>
+<section xml:id="_luồng_gửi_đơn_nghỉ_phép">
+<title>Luồng gửi đơn nghỉ phép</title>
+<screen>Failed to generate image: undefined method `to_sym' for nil:NilClass
+@startuml
+actor "Người dùng (Admin / HR / Manager / Employee)" as User
+participant "Giao diện Nghỉ phép" as View
+participant "LeaveController" as Controller
+participant "LeaveService" as Service
+participant "Cơ sở dữ liệu (Database)" as DB
+
+== Xem danh sách đơn nghỉ ==
+User -&gt; View: Mở trang "Quản lý Nghỉ phép"
+View -&gt; Controller: Gửi yêu cầu tải dữ liệu trang nghỉ phép
+Controller -&gt; Service: Lấy danh sách đơn nghỉ và danh sách nhân viên
+Service -&gt; DB: Truy vấn dữ liệu từ bảng nghỉ phép và nhân viên
+DB --&gt; Service: Trả về danh sách dữ liệu
+Service --&gt; Controller: Trả dữ liệu đã xử lý
+Controller -&gt; View: Đưa dữ liệu vào model để hiển thị
+User &lt;- View: Thấy danh sách đơn nghỉ trên giao diện
+
+== Gửi đơn nghỉ mới ==
+User -&gt; View: Nhập thông tin đơn nghỉ và nhấn "Gửi đơn"
+View -&gt; Controller: Gửi yêu cầu tạo mới đơn nghỉ
+Controller -&gt; Service: Yêu cầu lưu thông tin đơn nghỉ
+Service -&gt; DB: Kiểm tra nhân viên hợp lệ, lưu đơn nghỉ mới vào cơ sở dữ liệu
+DB --&gt; Service: Xác nhận lưu thành công
+Service --&gt; Controller: Trả kết quả lưu thành công
+Controller -&gt; View: Hiển thị thông báo “Đã tạo đơn xin nghỉ”
+User &lt;- View: Thấy đơn nghỉ mới xuất hiện trong danh sách
+
+== Cập nhật trạng thái đơn nghỉ ==
+User -&gt; View: Chọn người duyệt và trạng thái (Duyệt / Từ chối)
+View -&gt; Controller: Gửi yêu cầu cập nhật trạng thái đơn nghỉ
+Controller -&gt; Service: Gửi yêu cầu cập nhật trạng thái trong hệ thống
+Service -&gt; DB: Tìm đơn nghỉ, xác nhận người duyệt, cập nhật trạng thái và thời gian duyệt
+DB --&gt; Service: Xác nhận cập nhật thành công
+Service --&gt; Controller: Thông báo cập nhật hoàn tất
+Controller -&gt; View: Hiển thị “Đã cập nhật trạng thái đơn nghỉ”
+User &lt;- View: Thấy trạng thái đơn nghỉ thay đổi trên bảng
+
+== Xóa đơn nghỉ ==
+User -&gt; View: Chọn “Xóa” trên một đơn nghỉ
+View -&gt; Controller: Gửi yêu cầu xóa đơn nghỉ
+Controller -&gt; Service: Gửi yêu cầu xóa đơn nghỉ trong cơ sở dữ liệu
+Service -&gt; DB: Xóa bản ghi đơn nghỉ
+DB --&gt; Service: Xác nhận xóa thành công
+Service --&gt; Controller: Thông báo hoàn tất xóa
+Controller -&gt; View: Hiển thị “Đã xóa đơn nghỉ”
+User &lt;- View: Danh sách cập nhật, không còn bản ghi vừa xóa
+@enduml</screen>
+</section>
+</section>
+<section xml:id="_biểu_đồ_thực_thể_erd">
+<title>Biểu đồ Thực thể (ERD)</title>
+<screen>Failed to generate image: undefined method `to_sym' for nil:NilClass
+@startuml
+!define TABLE(name,desc) class name as "desc" &lt;&lt; (T,#FFAAAA) &gt;&gt;
+!define PK(x) &lt;b&gt;&lt;color:#b8861b&gt;&lt;&amp;key&gt;&lt;/color&gt; x&lt;/b&gt;
+!define FK(x) &lt;color:#aaaaaa&gt;&lt;/color&gt; x
+!define NN(x) &lt;color:#ef4444&gt;&lt;/color&gt; x
+!define UQ(x) &lt;color:#3b82f6&gt;&lt;/color&gt; x
+
+package "Leave Management" {
+    TABLE(leave_requests, "leave_requests") {
+        PK(id) BIGINT AUTO_INCREMENT
+        FK(employee_id) BIGINT NOT NULL
+        NN(type) VARCHAR(50) NOT NULL
+        NN(start_date) DATE NOT NULL
+        NN(end_date) DATE NOT NULL
+        NN(total_days) DECIMAL(5,2) NOT NULL
+        reason VARCHAR(255)
+        NN(status) VARCHAR(50) NOT NULL
+        FK(approver_id) BIGINT
+        decided_at DATETIME
+    }
+
+    TABLE(employees, "employees") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(full_name) VARCHAR(150) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        phone VARCHAR(30)
+        department VARCHAR(100)
+        position VARCHAR(100)
+        NN(hire_date) DATE NOT NULL
+        termination_date DATE
+        employment_status VARCHAR(50)
+        base_salary DECIMAL(12,2)
+        FK(manager_id) BIGINT
+        FK(user_id) BIGINT
+    }
+}
+
+' Relationships
+employees ||--o{ leave_requests : "employee_id"
+employees ||--o{ leave_requests : "approver_id"
+
+note right of leave_requests
+  **Leave Request**
+  - Đơn xin nghỉ phép của nhân viên
+  - Hỗ trợ nhiều loại nghỉ: ANNUAL, SICK, UNPAID, MATERNITY, PATERNITY, COMPENSATORY, OTHER
+  - Trạng thái: PENDING, APPROVED, REJECTED, CANCELLED
+  - Tự động tính số ngày nghỉ
+  - Quy trình phê duyệt với approver
+end note
+
+note right of employees
+  **Employee Reference**
+  - Thông tin nhân viên tạo đơn nghỉ
+  - Người duyệt đơn (approver)
+  - Liên kết 1-nhiều với leave_requests
+end note
+@enduml</screen>
+</section>
+<section xml:id="_thiết_kế_cơ_sở_dữ_liệu">
+<title>Thiết kế Cơ sở Dữ liệu</title>
+<section xml:id="_bảng_leave_requests">
+<title>Bảng leave_requests</title>
+<informaltable frame="all" rowsep="1" colsep="1">
+<tgroup cols="5">
+<colspec colname="col_1" colwidth="12.5*"/>
+<colspec colname="col_2" colwidth="25*"/>
+<colspec colname="col_3" colwidth="12.5*"/>
+<colspec colname="col_4" colwidth="12.5*"/>
+<colspec colname="col_5" colwidth="37.5*"/>
+<thead>
+<row>
+<entry align="left" valign="top">Cột</entry>
+<entry align="left" valign="top">Kiểu dữ liệu</entry>
+<entry align="left" valign="top">Ràng buộc</entry>
+<entry align="left" valign="top">Mô tả</entry>
+<entry align="left" valign="top">id</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry align="left" valign="top"><simpara>BIGINT AUTO_INCREMENT</simpara></entry>
+<entry align="left" valign="top"><simpara>PK</simpara></entry>
+<entry align="left" valign="top"><simpara>Khóa chính</simpara></entry>
+<entry align="left" valign="top"><simpara>employee_id</simpara></entry>
+<entry align="left" valign="top"><simpara>BIGINT</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>NOT NULL, FK</simpara></entry>
+<entry align="left" valign="top"><simpara>ID nhân viên</simpara></entry>
+<entry align="left" valign="top"><simpara>type</simpara></entry>
+<entry align="left" valign="top"><simpara>VARCHAR(50)</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Loại nghỉ (ANNUAL, SICK, UNPAID, MATERNITY, PATERNITY, COMPENSATORY, OTHER)</simpara></entry>
+<entry align="left" valign="top"><simpara>start_date</simpara></entry>
+<entry align="left" valign="top"><simpara>DATE</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+<entry align="left" valign="top"><simpara>Ngày bắt đầu nghỉ</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>end_date</simpara></entry>
+<entry align="left" valign="top"><simpara>DATE</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+<entry align="left" valign="top"><simpara>Ngày kết thúc nghỉ</simpara></entry>
+<entry align="left" valign="top"><simpara>total_days</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>DECIMAL(5,2)</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+<entry align="left" valign="top"><simpara>Tổng số ngày nghỉ</simpara></entry>
+<entry align="left" valign="top"><simpara>reason</simpara></entry>
+<entry align="left" valign="top"><simpara>VARCHAR(255)</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>NULL</simpara></entry>
+<entry align="left" valign="top"><simpara>Lý do nghỉ phép</simpara></entry>
+<entry align="left" valign="top"><simpara>status</simpara></entry>
+<entry align="left" valign="top"><simpara>VARCHAR(50)</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Trạng thái (PENDING, APPROVED, REJECTED, CANCELLED)</simpara></entry>
+<entry align="left" valign="top"><simpara>approver_id</simpara></entry>
+<entry align="left" valign="top"><simpara>BIGINT</simpara></entry>
+<entry align="left" valign="top"><simpara>FK</simpara></entry>
+<entry align="left" valign="top"><simpara>ID người duyệt</simpara></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+<simpara><emphasis role="strong">Các loại nghỉ phép (LeaveType)</emphasis>:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>ANNUAL: Nghỉ phép năm</simpara>
+</listitem>
+<listitem>
+<simpara>SICK: Nghỉ ốm</simpara>
+</listitem>
+<listitem>
+<simpara>UNPAID: Nghỉ không lương</simpara>
+</listitem>
+<listitem>
+<simpara>MATERNITY: Nghỉ thai sản</simpara>
+</listitem>
+<listitem>
+<simpara>PATERNITY: Nghỉ chăm sóc con</simpara>
+</listitem>
+<listitem>
+<simpara>COMPENSATORY: Nghỉ bù</simpara>
+</listitem>
+<listitem>
+<simpara>OTHER: Khác</simpara>
+</listitem>
+</itemizedlist>
+<simpara><emphasis role="strong">Trạng thái đơn (LeaveStatus)</emphasis>:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>PENDING: Chờ duyệt</simpara>
+</listitem>
+<listitem>
+<simpara>APPROVED: Đã duyệt</simpara>
+</listitem>
+<listitem>
+<simpara>REJECTED: Đã từ chối</simpara>
+</listitem>
+<listitem>
+<simpara>CANCELLED: Đã hủy</simpara>
+</listitem>
+</itemizedlist>
+<simpara><emphasis role="strong">Ràng buộc đặc biệt</emphasis>:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Mối quan hệ 1-nhiều giữa employees và leave_requests</simpara>
+</listitem>
+<listitem>
+<simpara>Người duyệt (approver_id) tham chiếu đến employees</simpara>
+</listitem>
+</itemizedlist>
+</section>
+</section>
+<section xml:id="_giao_diện_người_dùng">
+<title>Giao diện Người dùng</title>
+<section xml:id="_màn_hình_quản_lý_nghỉ_phép">
+<title>Màn hình Quản lý Nghỉ phép</title>
+<simpara>Trang quản lý nghỉ phép bao gồm 3 phần chính:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara><emphasis role="strong">Form tạo đơn mới</emphasis>: Cho phép nhập thông tin đơn nghỉ</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Bảng chờ duyệt</emphasis>: Hiển thị các đơn chưa được xử lý, có thể cập nhật trạng thái</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Bảng tất cả đơn</emphasis>: Lịch sử đầy đủ các đơn nghỉ phép</simpara>
+</listitem>
+</orderedlist>
+<informalfigure>
+<mediaobject>
+<imageobject>
+<imagedata fileref="images/leave-list.png" contentwidth="100%"/>
+</imageobject>
+<textobject><phrase>Màn hình Quản lý Nghỉ phép</phrase></textobject>
+</mediaobject>
+</informalfigure>
+</section>
+</section>
+</chapter>
+<chapter xml:id="_chức_năng_quản_lý_bảng_lương">
+<title>Chức năng Quản lý Bảng lương</title>
+<section xml:id="_khảo_sát_hệ_thống_2">
+<title>Khảo sát hệ thống</title>
+<section xml:id="_kiến_trúc_hệ_thống_2">
+<title>Kiến trúc hệ thống</title>
+<simpara>Hệ thống quản lý bảng lương được xây dựng với các tính năng:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Tính toán lương thực lĩnh tự động</simpara>
+</listitem>
+<listitem>
+<simpara>Quản lý theo kỳ lương (tháng/năm)</simpara>
+</listitem>
+<listitem>
+<simpara>Hỗ trợ lương cơ bản, tăng ca, thưởng, khấu trừ</simpara>
+</listitem>
+<listitem>
+<simpara>Lịch sử lương theo từng nhân viên</simpara>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_công_nghệ_sử_dụng_2">
+<title>Công nghệ sử dụng</title>
+<simpara>Cùng công nghệ với phần Quản lý Nghỉ phép:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Spring Boot 3.x</simpara>
+</listitem>
+<listitem>
+<simpara>Spring Data JPA</simpara>
+</listitem>
+<listitem>
+<simpara>Thymeleaf + Bootstrap</simpara>
+</listitem>
+<listitem>
+<simpara>MariaDB + Liquibase</simpara>
+</listitem>
+</itemizedlist>
+</section>
+</section>
+<section xml:id="_kịch_bản_sử_dụng_2">
+<title>Kịch bản sử dụng</title>
+<section xml:id="_use_case_1_tạo_bảng_lương">
+<title>Use Case 1: Tạo bảng lương</title>
+<simpara><emphasis role="strong">Mô tả</emphasis>: HR/Admin tạo bảng lương cho nhân viên</simpara>
+<simpara><emphasis role="strong">Luồng thực hiện</emphasis>:
+1. Truy cập menu "Bảng lương"
+2. Điền form thông tin lương:
+   - Chọn nhân viên
+   - Nhập năm và tháng lương
+   - Nhập lương cơ bản
+   - Nhập số giờ tăng ca và tiền tăng ca
+   - Nhập thưởng (nếu có)
+   - Nhập khấu trừ (nếu có)
+3. Click "Tính bảng lương"
+4. Hệ thống tự động tính lương thực lĩnh: <literal>net_pay = base_salary + overtime_amount + bonus - deductions</literal></simpara>
+<simpara><emphasis role="strong">Kết quả</emphasis>: Bảng lương được tạo và lưu vào cơ sở dữ liệu</simpara>
+</section>
+<section xml:id="_use_case_2_xem_danh_sách_bảng_lương">
+<title>Use Case 2: Xem danh sách bảng lương</title>
+<simpara><emphasis role="strong">Mô tả</emphasis>: HR/Admin xem tất cả bảng lương đã tạo</simpara>
+<simpara><emphasis role="strong">Luồng thực hiện</emphasis>:
+1. Truy cập menu "Bảng lương"
+2. Xem bảng danh sách với thông tin:
+   - Nhân viên
+   - Kỳ lương (tháng/năm)
+   - Lương cơ bản
+   - Tăng ca (giờ và tiền)
+   - Thưởng
+   - Khấu trừ
+   - Thực lĩnh</simpara>
+<simpara><emphasis role="strong">Kết quả</emphasis>: Danh sách bảng lương được hiển thị</simpara>
+</section>
+<section xml:id="_use_case_3_lọc_bảng_lương_theo_nhân_viên">
+<title>Use Case 3: Lọc bảng lương theo nhân viên</title>
+<simpara><emphasis role="strong">Mô tả</emphasis>: HR/Admin xem lịch sử lương của một nhân viên</simpara>
+<simpara><emphasis role="strong">Luồng thực hiện</emphasis>:
+1. Chọn nhân viên từ dropdown "Tất cả nhân viên"
+2. Click "Lọc"
+3. Hệ thống chỉ hiển thị bảng lương của nhân viên đó</simpara>
+<simpara><emphasis role="strong">Kết quả</emphasis>: Lịch sử lương của nhân viên được hiển thị</simpara>
+</section>
+</section>
+<section xml:id="_biểu_đồ_sequence_2">
+<title>Biểu đồ Sequence</title>
+<section xml:id="_luồng_tạo_và_quản_lý_bảng_lương">
+<title>Luồng tạo và quản lý bảng lương</title>
+<screen>Failed to generate image: undefined method `to_sym' for nil:NilClass
+@startuml
+actor "Người dùng (Admin / HR)" as User
+participant "Giao diện Quản lý Bảng lương" as View
+participant "PayrollController" as Controller
+participant "PayrollService" as Service
+participant "Cơ sở dữ liệu" as DB
+
+== Xem danh sách bảng lương ==
+User -&gt; View: Mở trang "Quản lý Bảng lương"
+View -&gt; Controller: Gửi yêu cầu tải danh sách bảng lương
+Controller -&gt; Service: Yêu cầu lấy dữ liệu bảng lương và danh sách nhân viên
+Service -&gt; DB: Truy vấn dữ liệu từ bảng nhân viên và bảng lương
+DB --&gt; Service: Trả về dữ liệu
+Service --&gt; Controller: Gửi dữ liệu bảng lương và nhân viên
+Controller -&gt; View: Truyền dữ liệu để hiển thị trên giao diện
+User &lt;- View: Xem danh sách bảng lương trên trang
+
+== Tạo hoặc cập nhật bảng lương ==
+User -&gt; View: Nhập thông tin lương (nhân viên, tháng, năm, lương cơ bản, thưởng, khấu trừ, v.v.)
+View -&gt; Controller: Gửi yêu cầu lưu thông tin bảng lương
+Controller -&gt; Service: Gửi yêu cầu xử lý tính toán và lưu dữ liệu bảng lương
+Service -&gt; DB: Kiểm tra nhân viên và bảng lương hiện có
+Service -&gt; DB: Nếu tồn tại thì cập nhật, nếu không thì tạo mới
+Service -&gt; DB: Tính toán lương thực lĩnh và lưu xuống CSDL
+DB --&gt; Service: Xác nhận lưu thành công
+Service --&gt; Controller: Trả về kết quả xử lý
+Controller -&gt; View: Hiển thị thông báo "Đã tạo hoặc cập nhật thành công"
+User &lt;- View: Thấy kết quả cập nhật trên giao diện
+
+== Lọc bảng lương theo nhân viên ==
+User -&gt; View: Chọn nhân viên cần xem
+View -&gt; Controller: Gửi yêu cầu lọc theo nhân viên
+Controller -&gt; Service: Lấy dữ liệu bảng lương của nhân viên đó
+Service -&gt; DB: Truy vấn bảng lương theo ID nhân viên
+DB --&gt; Service: Trả về kết quả
+Service --&gt; Controller: Truyền dữ liệu đã lọc
+Controller -&gt; View: Cập nhật danh sách hiển thị
+User &lt;- View: Xem kết quả lọc
+@enduml</screen>
+</section>
+</section>
+<section xml:id="_biểu_đồ_thực_thể_erd_2">
+<title>Biểu đồ Thực thể (ERD)</title>
+<screen>Failed to generate image: undefined method `to_sym' for nil:NilClass
+@startuml
+!define TABLE(name,desc) class name as "desc" &lt;&lt; (T,#FFAAAA) &gt;&gt;
+!define PK(x) &lt;b&gt;&lt;color:#b8861b&gt;&lt;&amp;key&gt;&lt;/color&gt; x&lt;/b&gt;
+!define FK(x) &lt;color:#aaaaaa&gt;&lt;/color&gt; x
+!define NN(x) &lt;color:#ef4444&gt;&lt;/color&gt; x
+!define UQ(x) &lt;color:#3b82f6&gt;&lt;/color&gt; x
+
+package "Payroll Management" {
+    TABLE(payrolls, "payrolls") {
+        PK(id) BIGINT AUTO_INCREMENT
+        FK(employee_id) BIGINT NOT NULL
+        NN(payroll_year) INT NOT NULL
+        NN(payroll_month) INT NOT NULL
+        NN(base_salary) DECIMAL(12,2) NOT NULL
+        overtime_hours DECIMAL(5,2) DEFAULT 0
+        overtime_amount DECIMAL(12,2) DEFAULT 0
+        bonus DECIMAL(12,2) DEFAULT 0
+        deductions DECIMAL(12,2) DEFAULT 0
+        NN(net_pay) DECIMAL(12,2) NOT NULL
+        NN(generated_at) DATE NOT NULL
+    }
+
+    TABLE(employees, "employees") {
+        PK(id) BIGINT AUTO_INCREMENT
+        UQ(code) VARCHAR(50) NOT NULL
+        NN(full_name) VARCHAR(150) NOT NULL
+        UQ(email) VARCHAR(150) NOT NULL
+        phone VARCHAR(30)
+        department VARCHAR(100)
+        position VARCHAR(100)
+        NN(hire_date) DATE NOT NULL
+        termination_date DATE
+        employment_status VARCHAR(50)
+        base_salary DECIMAL(12,2)
+        FK(manager_id) BIGINT
+        FK(user_id) BIGINT
+    }
+}
+
+' Relationships
+employees ||--o{ payrolls : "employee_id"
+
+note right of payrolls
+  **Payroll Record**
+  - Quản lý bảng lương theo kỳ (tháng/năm)
+  - Tự động tính lương thực lĩnh
+  - Công thức: net_pay = base_salary + overtime_amount + bonus - deductions
+  - Unique constraint: (employee_id, payroll_year, payroll_month)
+  - Lưu lịch sử lương theo từng kỳ
+end note
+
+note right of employees
+  **Employee Reference**
+  - Thông tin nhân viên nhận lương
+  - Liên kết 1-nhiều với payrolls
+  - Quản lý lương cơ bản
+end note
+@enduml</screen>
+</section>
+<section xml:id="_thiết_kế_cơ_sở_dữ_liệu_2">
+<title>Thiết kế Cơ sở Dữ liệu</title>
+<section xml:id="_bảng_payrolls">
+<title>Bảng payrolls</title>
+<informaltable frame="all" rowsep="1" colsep="1">
+<tgroup cols="5">
+<colspec colname="col_1" colwidth="12.5*"/>
+<colspec colname="col_2" colwidth="25*"/>
+<colspec colname="col_3" colwidth="12.5*"/>
+<colspec colname="col_4" colwidth="12.5*"/>
+<colspec colname="col_5" colwidth="37.5*"/>
+<thead>
+<row>
+<entry align="left" valign="top">Cột</entry>
+<entry align="left" valign="top">Kiểu dữ liệu</entry>
+<entry align="left" valign="top">Ràng buộc</entry>
+<entry align="left" valign="top">Mô tả</entry>
+<entry align="left" valign="top">id</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry align="left" valign="top"><simpara>BIGINT AUTO_INCREMENT</simpara></entry>
+<entry align="left" valign="top"><simpara>PK</simpara></entry>
+<entry align="left" valign="top"><simpara>Khóa chính</simpara></entry>
+<entry align="left" valign="top"><simpara>employee_id</simpara></entry>
+<entry align="left" valign="top"><simpara>BIGINT</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>NOT NULL, FK</simpara></entry>
+<entry align="left" valign="top"><simpara>ID nhân viên</simpara></entry>
+<entry align="left" valign="top"><simpara>payroll_year</simpara></entry>
+<entry align="left" valign="top"><simpara>INT</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Năm lương</simpara></entry>
+<entry align="left" valign="top"><simpara>payroll_month</simpara></entry>
+<entry align="left" valign="top"><simpara>INT</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+<entry align="left" valign="top"><simpara>Tháng lương (1-12)</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>base_salary</simpara></entry>
+<entry align="left" valign="top"><simpara>DECIMAL(12,2)</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+<entry align="left" valign="top"><simpara>Lương cơ bản</simpara></entry>
+<entry align="left" valign="top"><simpara>overtime_hours</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>DECIMAL(5,2)</simpara></entry>
+<entry align="left" valign="top"><simpara>DEFAULT 0</simpara></entry>
+<entry align="left" valign="top"><simpara>Số giờ tăng ca</simpara></entry>
+<entry align="left" valign="top"><simpara>overtime_amount</simpara></entry>
+<entry align="left" valign="top"><simpara>DECIMAL(12,2)</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>DEFAULT 0</simpara></entry>
+<entry align="left" valign="top"><simpara>Tiền tăng ca</simpara></entry>
+<entry align="left" valign="top"><simpara>bonus</simpara></entry>
+<entry align="left" valign="top"><simpara>DECIMAL(12,2)</simpara></entry>
+<entry align="left" valign="top"><simpara>DEFAULT 0</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Thưởng</simpara></entry>
+<entry align="left" valign="top"><simpara>deductions</simpara></entry>
+<entry align="left" valign="top"><simpara>DECIMAL(12,2)</simpara></entry>
+<entry align="left" valign="top"><simpara>DEFAULT 0</simpara></entry>
+<entry align="left" valign="top"><simpara>Khấu trừ</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>net_pay</simpara></entry>
+<entry align="left" valign="top"><simpara>DECIMAL(12,2)</simpara></entry>
+<entry align="left" valign="top"><simpara>NOT NULL</simpara></entry>
+<entry align="left" valign="top"><simpara>Lương thực lĩnh</simpara></entry>
+<entry align="left" valign="top"><simpara>generated_at</simpara></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+<simpara><emphasis role="strong">Công thức tính lương</emphasis>:</simpara>
+<screen linenumbering="unnumbered">net_pay = base_salary + overtime_amount + bonus - deductions</screen>
+<simpara><emphasis role="strong">Ràng buộc đặc biệt</emphasis>:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Unique constraint: (employee_id, payroll_year, payroll_month) - Mỗi nhân viên chỉ có 1 bảng lương/kỳ</simpara>
+</listitem>
+<listitem>
+<simpara>Mối quan hệ 1-nhiều giữa employees và payrolls</simpara>
+</listitem>
+</itemizedlist>
+</section>
+</section>
+<section xml:id="_giao_diện_người_dùng_2">
+<title>Giao diện Người dùng</title>
+<section xml:id="_màn_hình_quản_lý_bảng_lương">
+<title>Màn hình Quản lý Bảng lương</title>
+<simpara>Trang quản lý bảng lương bao gồm 2 phần chính:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara><emphasis role="strong">Form tạo bảng lương</emphasis>: Cho phép nhập thông tin lương và tính toán tự động</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Bảng danh sách</emphasis>: Hiển thị tất cả bảng lương với bộ lọc theo nhân viên</simpara>
+</listitem>
+</orderedlist>
+<informalfigure>
+<mediaobject>
+<imageobject>
+<imagedata fileref="images/payroll-list.png" contentwidth="100%"/>
+</imageobject>
+<textobject><phrase>Màn hình Quản lý Bảng lương</phrase></textobject>
+</mediaobject>
+</informalfigure>
+</section>
+</section>
+</chapter>
+<chapter xml:id="_kết_luận">
+<title>Kết luận</title>
+<simpara>Tài liệu này đã mô tả chi tiết 2 chức năng quản lý quan trọng của hệ thống HRM InShield:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><emphasis role="strong">Quản lý Nghỉ phép</emphasis>: Quản lý đơn xin nghỉ với quy trình phê duyệt, hỗ trợ nhiều loại nghỉ phép</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Quản lý Bảng lương</emphasis>: Tính toán và quản lý lương theo kỳ, hỗ trợ lương cơ bản, tăng ca, thưởng, khấu trừ</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Mỗi chức năng được thiết kế với:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Kiến trúc rõ ràng với Spring Boot MVC</simpara>
+</listitem>
+<listitem>
+<simpara>Luồng xử lý logic và trực quan</simpara>
+</listitem>
+<listitem>
+<simpara>Thiết kế cơ sở dữ liệu hợp lý</simpara>
+</listitem>
+<listitem>
+<simpara>Giao diện người dùng thân thiện</simpara>
+</listitem>
+</itemizedlist>
+<section xml:id="_công_nghệ_và_kiến_trúc">
+<title>Công nghệ và Kiến trúc</title>
+<simpara>Hệ thống sử dụng:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><emphasis role="strong">Backend</emphasis>: Spring Boot 3.x, Spring Data JPA, Spring Security</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Frontend</emphasis>: Thymeleaf, Bootstrap 5.x</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Database</emphasis>: MariaDB 10.x với Liquibase migration</simpara>
+</listitem>
+<listitem>
+<simpara><emphasis role="strong">Security</emphasis>: Role-based access control</simpara>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_hướng_phát_triển">
+<title>Hướng phát triển</title>
+<simpara>Các chức năng có thể được mở rộng với:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Tích hợp email gửi thông báo phê duyệt đơn nghỉ</simpara>
+</listitem>
+<listitem>
+<simpara>Tự động tính toán giờ làm việc từ attendance records</simpara>
+</listitem>
+<listitem>
+<simpara>Báo cáo thống kê nghỉ phép và lương</simpara>
+</listitem>
+<listitem>
+<simpara>Export PDF cho bảng lương</simpara>
+</listitem>
+<listitem>
+<simpara>Duyệt đơn nghỉ theo workflow</simpara>
+</listitem>
+<listitem>
+<simpara>Tích hợp API với hệ thống bên ngoài</simpara>
+</listitem>
+</itemizedlist>
+</section>
+</chapter>
+</book>

@@ -10,9 +10,11 @@ public class PartnerListItemDto {
     private String name;
     private String email;
     private String phone;
+    private String address;
     private PartnerType partnerType;
     private String status;
     private LocalDate startDate;
+    private String notes;
 
     public Long getId() {
         return id;
@@ -54,6 +56,14 @@ public class PartnerListItemDto {
         this.phone = phone;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public PartnerType getPartnerType() {
         return partnerType;
     }
@@ -76,5 +86,13 @@ public class PartnerListItemDto {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

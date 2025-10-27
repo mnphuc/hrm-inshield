@@ -57,9 +57,11 @@ public class PartnerMapper {
         dto.setName(partner.getName());
         dto.setEmail(partner.getEmail());
         dto.setPhone(partner.getPhone());
+        dto.setAddress(partner.getAddress());
         dto.setPartnerType(partner.getPartnerType());
         dto.setStatus(partner.getStatus());
         dto.setStartDate(partner.getStartDate());
+        dto.setNotes(partner.getNotes());
         return dto;
     }
 }
