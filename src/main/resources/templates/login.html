@@ -2,30 +2,37 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechShield Insight - Đăng nhập</title>
     <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
 </head>
 <body class="login-page">
 <div class="login-card">
-    <h1>TechShield Insight</h1>
-    <p class="subtitle">Hệ thống Quản lý Nhân sự</p>
+    <div class="login-header">
+        <div class="login-logo">🚀</div>
+        <h1>TechShield Insight</h1>
+        <p class="subtitle">Hệ thống Quản lý Nhân sự</p>
+    </div>
     <form method="post" action="/login">
-        <div class="form-group" style="display: flex; flex-direction: column; text-align: left; font-size: 14px">
+        <div class="field">
             <label for="username">Tên đăng nhập</label>
-            <input id="username" name="username" type="text" required autofocus>
+            <input id="username" name="username" type="text" required autofocus placeholder="Nhập tên đăng nhập">
         </div>
-        <div class="form-group" style="display: flex; flex-direction: column; text-align: left; font-size: 14px">
+        <div class="field">
             <label for="password">Mật khẩu</label>
-            <input id="password" name="password" type="password" required>
+            <input id="password" name="password" type="password" required placeholder="Nhập mật khẩu">
         </div>
-        <button type="submit">Đăng nhập</button>
+        <button type="submit" class="button" style="width: 100%; margin-top: 8px;">Đăng nhập</button>
         <div class="alert error" th:if="${param.error}">
-            Thông tin đăng nhập không đúng, vui lòng thử lại.
+            ⚠️ Thông tin đăng nhập không đúng, vui lòng thử lại.
         </div>
         <div class="alert success" th:if="${param.logout}">
-            Bạn đã đăng xuất khỏi hệ thống.
+            ✓ Bạn đã đăng xuất khỏi hệ thống.
         </div>
     </form>
+    <div class="login-footer">
+        <p class="help-text">Sử dụng tài khoản admin để đăng nhập</p>
+    </div>
 </div>
 </body>
 </html>

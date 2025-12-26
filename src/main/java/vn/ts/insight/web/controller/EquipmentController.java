@@ -38,30 +38,48 @@ public class EquipmentController {
     @GetMapping
     public String manageEquipment(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) EquipmentStatus status,
+            @RequestParam(required = false) String statusStr,
             @RequestParam(required = false) String type,
             Model model) {
         
-        List<EquipmentListItemDto> equipment;
-        if (name != null || status != null || type != null) {
-            equipment = equipmentService.findByFilters(name, status, type);
-        } else {
-            equipment = equipmentService.findAll();
-        }
-        
-        List<Employee> employees = employeeRepository.findAll();
-        
-        model.addAttribute("equipment", equipment);
-        model.addAttribute("employees", employees);
-        model.addAttribute("pageTitle", "Quản lý thiết bị");
-        model.addAttribute("pageHeader", "Danh sách thiết bị");
-        model.addAttribute("equipmentStatuses", EquipmentStatus.values());
-        
-        if (!model.containsAttribute("equipmentForm")) {
+        try {
+            EquipmentStatus status = null;
+            if (statusStr != null && !statusStr.isEmpty()) {
+                try {
+                    status = EquipmentStatus.valueOf(statusStr.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    // Invalid status, ignore
+                }
+            }
+            
+            List<EquipmentListItemDto> equipment;
+            if (name != null && !name.isEmpty() || status != null || (type != null && !type.isEmpty())) {
+                equipment = equipmentService.findByFilters(name, status, type);
+            } else {
+                equipment = equipmentService.findAll();
+            }
+            
+            List<Employee> employees = employeeRepository.findAll();
+            
+            model.addAttribute("equipment", equipment);
+            model.addAttribute("employees", employees);
+            model.addAttribute("pageTitle", "Quản lý thiết bị");
+            model.addAttribute("pageHeader", "Danh sách thiết bị");
+            model.addAttribute("equipmentStatuses", EquipmentStatus.values());
+            
+            if (!model.containsAttribute("equipmentForm")) {
+                model.addAttribute("equipmentForm", new EquipmentRequest());
+            }
+            
+            if (!model.containsAttribute("assignForm")) {
+                model.addAttribute("assignForm", new AssignEquipmentRequest());
+            }
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Lỗi khi tải dữ liệu: " + e.getMessage());
+            model.addAttribute("equipment", java.util.Collections.<EquipmentListItemDto>emptyList());
+            model.addAttribute("employees", java.util.Collections.<Employee>emptyList());
+            model.addAttribute("equipmentStatuses", EquipmentStatus.values());
             model.addAttribute("equipmentForm", new EquipmentRequest());
-        }
-        
-        if (!model.containsAttribute("assignForm")) {
             model.addAttribute("assignForm", new AssignEquipmentRequest());
         }
         

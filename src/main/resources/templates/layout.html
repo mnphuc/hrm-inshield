@@ -16,23 +16,50 @@
         </div>
         <nav class="nav">
             <a th:href="@{/dashboard}"
-               th:classappend="${currentPath != null and currentPath == '/dashboard'} ? 'active' : ''">Bảng điều khiển</a>
+               th:classappend="${currentPath != null and currentPath == '/dashboard'} ? 'active' : ''">
+                <span class="nav-icon">📊</span>
+                <span>Bảng điều khiển</span>
+            </a>
             <a th:href="@{/cms/employees}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/employees')} ? 'active' : ''">Nhân viên</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/employees')} ? 'active' : ''">
+                <span class="nav-icon">👥</span>
+                <span>Nhân viên</span>
+            </a>
             <a th:href="@{/cms/attendance}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/attendance')} ? 'active' : ''">Chấm công</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/attendance')} ? 'active' : ''">
+                <span class="nav-icon">⏰</span>
+                <span>Chấm công</span>
+            </a>
             <a th:href="@{/cms/projects}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/projects')} ? 'active' : ''">Dự án</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/projects')} ? 'active' : ''">
+                <span class="nav-icon">📁</span>
+                <span>Dự án</span>
+            </a>
             <a th:href="@{/cms/expenses}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/expenses')} ? 'active' : ''">Chi phí</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/expenses')} ? 'active' : ''">
+                <span class="nav-icon">💸</span>
+                <span>Chi phí</span>
+            </a>
             <a th:href="@{/cms/leave}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/leave')} ? 'active' : ''">Nghỉ phép</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/leave')} ? 'active' : ''">
+                <span class="nav-icon">🏖️</span>
+                <span>Nghỉ phép</span>
+            </a>
             <a th:href="@{/cms/payrolls}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/payrolls')} ? 'active' : ''">Bảng lương</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/payrolls')} ? 'active' : ''">
+                <span class="nav-icon">💰</span>
+                <span>Bảng lương</span>
+            </a>
             <a th:href="@{/cms/partners}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/partners')} ? 'active' : ''">Đối tác</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/partners')} ? 'active' : ''">
+                <span class="nav-icon">🤝</span>
+                <span>Đối tác</span>
+            </a>
             <a th:href="@{/cms/equipment}"
-               th:classappend="${currentPath != null and currentPath.startsWith('/cms/equipment')} ? 'active' : ''">Thiết bị</a>
+               th:classappend="${currentPath != null and currentPath.startsWith('/cms/equipment')} ? 'active' : ''">
+                <span class="nav-icon">💻</span>
+                <span>Thiết bị</span>
+            </a>
         </nav>
         <form th:action="@{/logout}" method="post" class="logout-form">
             <button type="submit">Đăng xuất</button>

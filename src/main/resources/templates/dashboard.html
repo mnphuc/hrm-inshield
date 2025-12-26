@@ -1,18 +1,79 @@
 ﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
 <section th:fragment="content">
-    <div class="grid">
-        <article class="card">
-            <h2>Chào mừng</h2>
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card stat-card-primary">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <div class="stat-value" th:text="${employeeCount ?: '0'}">0</div>
+                <div class="stat-label">Nhân viên</div>
+            </div>
+        </div>
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon">📁</div>
+            <div class="stat-content">
+                <div class="stat-value" th:text="${projectCount ?: '0'}">0</div>
+                <div class="stat-label">Dự án</div>
+            </div>
+        </div>
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon">🏖️</div>
+            <div class="stat-content">
+                <div class="stat-value" th:text="${pendingLeaveCount ?: '0'}">0</div>
+                <div class="stat-label">Đơn nghỉ phép chờ duyệt</div>
+            </div>
+        </div>
+        <div class="stat-card stat-card-info">
+            <div class="stat-icon">💻</div>
+            <div class="stat-content">
+                <div class="stat-value" th:text="${equipmentCount ?: '0'}">0</div>
+                <div class="stat-label">Thiết bị</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome and Quick Actions -->
+    <div class="grid two-columns">
+        <article class="card welcome-card">
+            <div class="welcome-header">
+                <h2>Chào mừng đến với HRM Insight</h2>
+                <div class="welcome-icon">👋</div>
+            </div>
             <p>Sử dụng thanh điều hướng bên trái để quản lý nhân sự, chấm công, dự án, chi phí, nghỉ phép và bảng lương.</p>
+            <div class="quick-actions">
+                <a th:href="@{/cms/employees}" class="quick-action-btn">
+                    <span>👥</span> Quản lý Nhân viên
+                </a>
+                <a th:href="@{/cms/attendance}" class="quick-action-btn">
+                    <span>⏰</span> Chấm công
+                </a>
+                <a th:href="@{/cms/projects}" class="quick-action-btn">
+                    <span>📁</span> Dự án
+                </a>
+            </div>
         </article>
-        <article class="card">
-            <h3>Quy trình đề xuất</h3>
-            <ul>
-                <li>Cập nhật danh mục nhân viên và phân quyền người dùng</li>
-                <li>Theo dõi chấm công và phân công dự án hằng ngày</li>
-                <li>Phê duyệt chi phí và đơn nghỉ phép kịp thời</li>
-                <li>Lập bảng lương chính xác mỗi tháng</li>
+        <article class="card process-card">
+            <h3 class="card-title-with-icon">
+                <span>📋</span> Quy trình đề xuất
+            </h3>
+            <ul class="process-list">
+                <li>
+                    <span class="process-icon">✓</span>
+                    <span>Cập nhật danh mục nhân viên và phân quyền người dùng</span>
+                </li>
+                <li>
+                    <span class="process-icon">✓</span>
+                    <span>Theo dõi chấm công và phân công dự án hằng ngày</span>
+                </li>
+                <li>
+                    <span class="process-icon">✓</span>
+                    <span>Phê duyệt chi phí và đơn nghỉ phép kịp thời</span>
+                </li>
+                <li>
+                    <span class="process-icon">✓</span>
+                    <span>Lập bảng lương chính xác mỗi tháng</span>
+                </li>
             </ul>
         </article>
     </div>

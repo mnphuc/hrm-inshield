@@ -5,23 +5,40 @@
         <div class="table-actions">
             <div>
                 <button type="button" class="button" data-open-modal="equipmentModal" data-mode="create">
-                    + Thêm thiết bị
+                    ➕ Thêm thiết bị mới
                 </button>
+            </div>
+            <div class="table-summary" th:if="${equipment != null and !equipment.isEmpty()}">
+                Tổng cộng: <strong th:text="${equipment.size()}">0</strong> thiết bị
             </div>
         </div>
         
         <!-- Filter form -->
-        <form th:action="@{/cms/equipment}" method="get" class="filters">
-            <input type="text" name="name" placeholder="Tìm theo tên" th:value="${param.name}">
-            <select name="status">
-                <option value="">Tất cả trạng thái</option>
-                <option th:each="status : ${equipmentStatuses}" 
-                        th:value="${status}" 
-                        th:selected="${param.status == status}"
-                        th:text="${status.displayName}"></option>
-            </select>
-            <input type="text" name="type" placeholder="Tìm theo loại" th:value="${param.type}">
-            <button type="submit" class="button secondary">Lọc</button>
+        <form th:action="@{/cms/equipment}" method="get" class="filter-card">
+            <div class="filter-grid">
+                <div class="field">
+                    <label for="filter-name">🔍 Tìm theo tên</label>
+                    <input id="filter-name" type="text" name="name" placeholder="Nhập tên thiết bị" th:value="${param.name}">
+                </div>
+                <div class="field">
+                    <label for="filter-status">📊 Trạng thái</label>
+                    <select id="filter-status" name="status">
+                        <option value="">Tất cả trạng thái</option>
+                        <option th:each="status : ${equipmentStatuses}" 
+                                th:value="${status.name()}" 
+                                th:selected="${param.status != null and param.status.toString() == status.name()}"
+                                th:text="${status.displayName}"></option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="filter-type">🏷️ Loại thiết bị</label>
+                    <input id="filter-type" type="text" name="type" placeholder="Nhập loại thiết bị" th:value="${param.type}">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="button">🔍 Lọc</button>
+                    <a th:href="@{/cms/equipment}" class="button secondary">🔄 Xóa</a>
+                </div>
+            </div>
         </form>
         
         <div class="table-wrapper">
@@ -41,58 +58,71 @@
                 </thead>
                 <tbody>
                     <tr th:each="item : ${equipment}">
-                        <td th:text="${item.code}"></td>
-                        <td th:text="${item.name}"></td>
-                        <td th:text="${item.type}"></td>
-                        <td th:text="${item.serialNumber}"></td>
-                        <td th:text="${item.status.displayName}"></td>
-                        <td th:text="${#temporals.format(item.purchaseDate, 'dd/MM/yyyy')}"></td>
-                        <td th:text="${#numbers.formatDecimal(item.purchasePrice, 0, 'COMMA', 2, 'POINT')}"></td>
+                        <td th:text="${item.code ?: '-'}"></td>
+                        <td th:text="${item.name ?: '-'}"></td>
+                        <td th:text="${item.type ?: '-'}"></td>
+                        <td th:text="${item.serialNumber ?: '-'}"></td>
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${item.status != null ? 'status-' + item.status.name().toLowerCase() : ''}"
+                                  th:text="${item.status != null ? item.status.displayName : '-'}"></span>
+                        </td>
+                        <td th:text="${item.purchaseDate != null ? #temporals.format(item.purchaseDate, 'dd/MM/yyyy') : '-'}"></td>
+                        <td th:text="${item.purchasePrice != null ? #numbers.formatDecimal(item.purchasePrice, 0, 'COMMA', 2, 'POINT') : '-'}"></td>
                         <td th:text="${item.assignedToEmployeeName ?: 'Chưa phân bổ'}"></td>
                         <td class="actions-cell">
-                            <button type="button" class="button-link" data-open-modal="equipmentModal" data-mode="edit"
-                                    th:attr="data-record-id=${item.id},
-                                             data-update-url=@{/cms/equipment/{id}/update(id=${item.id})},
-                                             data-value-code=${item.code},
-                                             data-value-name=${item.name},
-                                             data-value-type=${item.type},
-                                             data-value-serial-number=${item.serialNumber},
-                                             data-value-status=${item.status},
-                                             data-value-purchase-date=${item.purchaseDate},
-                                             data-value-purchase-price=${item.purchasePrice},
-                                             data-value-notes=${item.notes}">
-                                Chỉnh sửa
-                            </button>
-                            
-                            <!-- Assign/Unassign buttons -->
-                            <form th:if="${item.status.name() == 'AVAILABLE'}" 
-                                  th:action="@{/cms/equipment/{id}/assign(id=${item.id})}" 
-                                  method="post" 
-                                  style="display: inline;">
-                                <select name="employeeId" required style="margin-right: 8px;">
-                                    <option value="">-- Chọn nhân viên --</option>
-                                    <option th:each="emp : ${employees}" 
-                                            th:value="${emp.id}" 
-                                            th:text="${emp.fullName}"></option>
-                                </select>
-                                <button type="submit" class="button-link">Phân bổ</button>
-                            </form>
-                            
-                            <form th:if="${item.status.name() == 'ASSIGNED'}" 
-                                  th:action="@{/cms/equipment/{id}/unassign(id=${item.id})}" 
-                                  method="post" 
-                                  style="display: inline;">
-                                <button type="submit" class="button-link">Hủy phân bổ</button>
-                            </form>
-                            
-                            <form th:action="@{/cms/equipment/{id}/delete(id=${item.id})}" method="post"
-                                  th:attr="data-confirm-message=${'Bạn có chắc muốn xóa ' + item.name + '?'}">
-                                <button type="submit" class="link danger">Xóa</button>
-                            </form>
+                            <div class="action-buttons">
+                                <button type="button" class="action-btn action-edit" data-open-modal="equipmentModal" data-mode="edit"
+                                        th:attr="data-record-id=${item.id},
+                                                 data-update-url=@{/cms/equipment/{id}/update(id=${item.id})},
+                                                 data-value-code=${item.code != null ? item.code : ''},
+                                                 data-value-name=${item.name != null ? item.name : ''},
+                                                 data-value-type=${item.type != null ? item.type : ''},
+                                                 data-value-serial-number=${item.serialNumber != null ? item.serialNumber : ''},
+                                                 data-value-status=${item.status != null ? item.status.name() : ''},
+                                                 data-value-purchase-date=${item.purchaseDate != null ? #temporals.format(item.purchaseDate, 'yyyy-MM-dd') : ''},
+                                                 data-value-purchase-price=${item.purchasePrice != null ? item.purchasePrice.toString() : ''}">
+                                    ✏️ Sửa
+                                </button>
+                                
+                                <!-- Assign/Unassign buttons -->
+                                <form th:if="${item.status != null and item.status.name() == 'AVAILABLE'}" 
+                                      th:action="@{/cms/equipment/{id}/assign(id=${item.id})}" 
+                                      method="post" 
+                                      class="assign-form">
+                                    <select name="employeeId" required class="employee-select">
+                                        <option value="">-- Chọn nhân viên --</option>
+                                        <option th:each="emp : ${employees}" 
+                                                th:value="${emp.id}" 
+                                                th:text="${emp.fullName}"></option>
+                                    </select>
+                                    <button type="submit" class="action-btn action-assign">📦 Phân bổ</button>
+                                </form>
+                                
+                                <form th:if="${item.status != null and item.status.name() == 'ASSIGNED'}" 
+                                      th:action="@{/cms/equipment/{id}/unassign(id=${item.id})}" 
+                                      method="post" 
+                                      class="inline-form">
+                                    <button type="submit" class="action-btn action-unassign">↩️ Hủy</button>
+                                </form>
+                                
+                                <form th:action="@{/cms/equipment/{id}/delete(id=${item.id})}" method="post"
+                                      th:attr="data-confirm-message=${'Bạn có chắc muốn xóa ' + (item.name != null ? item.name : 'thiết bị này') + '?'}"
+                                      class="inline-form">
+                                    <button type="submit" class="action-btn action-delete">🗑️ Xóa</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
-                    <tr th:if="${equipment.isEmpty()}">
-                        <td colspan="9" class="empty">Chưa có thiết bị nào</td>
+                    <tr th:if="${equipment == null or equipment.isEmpty()}">
+                        <td colspan="9" class="empty">
+                            <div>Chưa có thiết bị nào</div>
+                            <div style="margin-top: 16px;">
+                                <button type="button" class="button" data-open-modal="equipmentModal" data-mode="create">
+                                    ➕ Thêm thiết bị đầu tiên
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -140,7 +170,7 @@
                         <select id="status" th:field="*{status}" data-field="status">
                             <option value="">-- Chọn trạng thái --</option>
                             <option th:each="status : ${equipmentStatuses}" 
-                                    th:value="${status}" 
+                                    th:value="${status.name()}" 
                                     th:text="${status.displayName}"></option>
                         </select>
                         <small th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="error-text">Lỗi</small>
