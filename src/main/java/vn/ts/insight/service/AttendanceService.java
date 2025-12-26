@@ -66,6 +66,50 @@ public class AttendanceService {
         return new PageImpl<>(content, pageable, result.getTotalElements());
     }
 
+    public Page<AttendanceResponse> findPageWithFilters(int page, int size, Long employeeId, LocalDate startDate, LocalDate endDate) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AttendanceRecord> result;
+        
+        // Build query based on filters
+        if (employeeId == null && startDate == null && endDate == null) {
+            result = attendanceRecordRepository.findAll(pageable);
+        } else {
+            // Filter in memory - in production should use JPA Specification
+            List<AttendanceRecord> allRecords = attendanceRecordRepository.findAll();
+            List<AttendanceRecord> filtered = allRecords.stream()
+                .filter(record -> {
+                    boolean matches = true;
+                    if (employeeId != null) {
+                        matches = matches && (record.getEmployee() != null && 
+                            record.getEmployee().getId().equals(employeeId));
+                    }
+                    if (startDate != null) {
+                        matches = matches && (record.getWorkDate() != null && 
+                            !record.getWorkDate().isBefore(startDate));
+                    }
+                    if (endDate != null) {
+                        matches = matches && (record.getWorkDate() != null && 
+                            !record.getWorkDate().isAfter(endDate));
+                    }
+                    return matches;
+                })
+                .collect(Collectors.toList());
+            
+            // Manual pagination
+            int start = page * size;
+            int end = Math.min(start + size, filtered.size());
+            List<AttendanceRecord> pageContent = start < filtered.size() 
+                ? filtered.subList(start, end) 
+                : List.of();
+            result = new PageImpl<>(pageContent, pageable, filtered.size());
+        }
+        
+        List<AttendanceResponse> content = result.getContent().stream()
+            .map(attendanceMapper::toResponse)
+            .collect(Collectors.toList());
+        return new PageImpl<>(content, pageable, result.getTotalElements());
+    }
+
     public List<AttendanceResponse> findAll() {
         return attendanceRecordRepository.findAll().stream()
             .map(attendanceMapper::toResponse)
@@ -107,7 +151,7 @@ public class AttendanceService {
         if (checkOut.isAfter(checkIn)) {
             long minutes = ChronoUnit.MINUTES.between(checkIn, checkOut);
             double hours = minutes / 60.0;
-            return BigDecimal.valueOf(hours).setScale(2, BigDecimal.ROUND_HALF_UP);
+            return BigDecimal.valueOf(hours).setScale(2, java.math.RoundingMode.HALF_UP);
         }
         return BigDecimal.ZERO;
     }

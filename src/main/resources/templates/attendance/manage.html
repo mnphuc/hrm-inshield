@@ -5,22 +5,56 @@
         <div class="table-actions">
             <div>
                 <button type="button" class="button" data-open-modal="attendanceModal" data-mode="create">
-                    + Thêm chấm công
+                    ➕ Thêm chấm công
                 </button>
             </div>
-            <div class="pagination" th:if="${totalPages > 1}">
-                <a class="page-link"
-                   th:classappend="${currentPage == 0}? 'disabled'"
-                   th:href="${currentPage == 0}? '#': @{/cms/attendance(page=${currentPage - 1}, size=${pageSize})}">Trang trước</a>
-                <a class="page-link"
-                   th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
-                   th:text="${pageNum + 1}"
-                   th:href="@{/cms/attendance(page=${pageNum}, size=${pageSize})}"
-                   th:classappend="${pageNum == currentPage}? 'active'">1</a>
-                <a class="page-link"
-                   th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
-                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/attendance(page=${currentPage + 1}, size=${pageSize})}">Trang sau</a>
+            <div class="table-summary" th:if="${records != null and !records.isEmpty()}">
+                Tổng cộng: <strong th:text="${totalElements}">0</strong> bản ghi
             </div>
+        </div>
+        
+        <!-- Filter form -->
+        <form th:action="@{/cms/attendance}" method="get" class="filter-card">
+            <input type="hidden" name="page" value="0">
+            <input type="hidden" name="size" th:value="${pageSize}">
+            <div class="filter-grid">
+                <div class="field">
+                    <label for="filter-employee">👤 Nhân viên</label>
+                    <select id="filter-employee" name="employeeId">
+                        <option value="">Tất cả nhân viên</option>
+                        <option th:each="employee : ${employees}" 
+                                th:value="${employee.id}" 
+                                th:selected="${filterEmployeeId != null and filterEmployeeId.equals(employee.id)}"
+                                th:text="${employee.fullName}"></option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="filter-start-date">📅 Từ ngày</label>
+                    <input id="filter-start-date" type="date" name="startDate" th:value="${filterStartDate}">
+                </div>
+                <div class="field">
+                    <label for="filter-end-date">📅 Đến ngày</label>
+                    <input id="filter-end-date" type="date" name="endDate" th:value="${filterEndDate}">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="button">🔍 Lọc</button>
+                    <a th:href="@{/cms/attendance}" class="button secondary">🔄 Xóa</a>
+                </div>
+            </div>
+        </form>
+        
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a class="page-link"
+               th:classappend="${currentPage == 0}? 'disabled'"
+               th:href="${currentPage == 0}? '#': @{/cms/attendance(page=${currentPage - 1}, size=${pageSize}, employeeId=${filterEmployeeId}, startDate=${filterStartDate}, endDate=${filterEndDate})}">Trang trước</a>
+            <a class="page-link"
+               th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+               th:text="${pageNum + 1}"
+               th:href="@{/cms/attendance(page=${pageNum}, size=${pageSize}, employeeId=${filterEmployeeId}, startDate=${filterStartDate}, endDate=${filterEndDate})}"
+               th:classappend="${pageNum == currentPage}? 'active'">1</a>
+            <a class="page-link"
+               th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
+               th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/attendance(page=${currentPage + 1}, size=${pageSize}, employeeId=${filterEmployeeId}, startDate=${filterStartDate}, endDate=${filterEndDate})}">Trang sau</a>
         </div>
         <div class="table-wrapper">
             <table class="data-table">

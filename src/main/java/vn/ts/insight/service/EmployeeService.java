@@ -62,6 +62,53 @@ public class EmployeeService {
         return new PageImpl<>(content, pageable, result.getTotalElements());
     }
 
+    public Page<EmployeeResponse> findPageWithFilters(int page, int size, String name, String department, String employmentStatus) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Employee> result;
+        
+        // Build query based on filters
+        if ((name == null || name.isEmpty()) && 
+            (department == null || department.isEmpty()) && 
+            (employmentStatus == null || employmentStatus.isEmpty())) {
+            result = employeeRepository.findAll(pageable);
+        } else {
+            // Use Specification or custom query - for now, filter in memory after fetching
+            // In production, should use JPA Specification for better performance
+            List<Employee> allEmployees = employeeRepository.findAll();
+            List<Employee> filtered = allEmployees.stream()
+                .filter(emp -> {
+                    boolean matches = true;
+                    if (name != null && !name.isEmpty()) {
+                        matches = matches && (emp.getFullName() != null && 
+                            emp.getFullName().toLowerCase().contains(name.toLowerCase()));
+                    }
+                    if (department != null && !department.isEmpty()) {
+                        matches = matches && (emp.getDepartment() != null && 
+                            emp.getDepartment().equalsIgnoreCase(department));
+                    }
+                    if (employmentStatus != null && !employmentStatus.isEmpty()) {
+                        matches = matches && (emp.getEmploymentStatus() != null && 
+                            emp.getEmploymentStatus().equalsIgnoreCase(employmentStatus));
+                    }
+                    return matches;
+                })
+                .collect(Collectors.toList());
+            
+            // Manual pagination
+            int start = page * size;
+            int end = Math.min(start + size, filtered.size());
+            List<Employee> pageContent = start < filtered.size() 
+                ? filtered.subList(start, end) 
+                : List.of();
+            result = new PageImpl<>(pageContent, pageable, filtered.size());
+        }
+        
+        List<EmployeeResponse> content = result.getContent().stream()
+                .map(employeeMapper::toResponse)
+                .toList();
+        return new PageImpl<>(content, pageable, result.getTotalElements());
+    }
+
     public EmployeeResponse getById(Long id) {
         Employee employee = employeeRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException(EMPLOYEE_NOT_FOUND));
@@ -101,8 +148,16 @@ public class EmployeeService {
             userAccountRepository.save(account);
             employee.setAccount(account);
             employeeRepository.save(employee);
-            String body = buildAccountEmailBody(employee.getFullName(), account.getUsername(), rawPassword);
-            mailService.sendMail(employee.getEmail(), "Thông tin tài khoản TechShield", body);
+            
+            // Try to send email, but don't fail if it doesn't work
+            try {
+                String body = buildAccountEmailBody(employee.getFullName(), account.getUsername(), rawPassword);
+                mailService.sendMail(employee.getEmail(), "Thông tin tài khoản TechShield", body);
+            } catch (Exception e) {
+                // Log error but don't throw - employee and account are already created
+                // In production, should use proper logging framework
+                System.err.println("Failed to send email to " + employee.getEmail() + ": " + e.getMessage());
+            }
         }
         return employeeMapper.toResponse(employee);
     }

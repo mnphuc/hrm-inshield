@@ -39,11 +39,14 @@ public class AttendanceController {
     public String manageAttendance(
         @RequestParam(value = "page", defaultValue = "0") int page,
         @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "employeeId", required = false) Long employeeId,
+        @RequestParam(value = "startDate", required = false) java.time.LocalDate startDate,
+        @RequestParam(value = "endDate", required = false) java.time.LocalDate endDate,
         Model model
     ) {
         model.addAttribute("pageTitle", "Chấm công");
         model.addAttribute("pageHeader", "Quản lý chấm công");
-        populateModel(model, page, size);
+        populateModel(model, page, size, employeeId, startDate, endDate);
         if (!model.containsAttribute("attendanceForm")) {
             AttendanceRequest attendanceForm = new AttendanceRequest();
             // Set default values
@@ -112,8 +115,8 @@ public class AttendanceController {
         return "redirect:/cms/attendance";
     }
 
-    private void populateModel(Model model, int page, int size) {
-        var recordPage = attendanceService.findPage(page, size);
+    private void populateModel(Model model, int page, int size, Long employeeId, java.time.LocalDate startDate, java.time.LocalDate endDate) {
+        var recordPage = attendanceService.findPageWithFilters(page, size, employeeId, startDate, endDate);
         int start = page * size + 1;
         int end = Math.min((page + 1) * size, (int) recordPage.getTotalElements());
         model.addAttribute("startRecord", start);
@@ -124,10 +127,14 @@ public class AttendanceController {
         model.addAttribute("employeeNameMap", employeeNameMap);
         model.addAttribute("employees", employees);
         model.addAttribute("records", recordPage.getContent());
-        model.addAttribute("employees", employees);
         model.addAttribute("currentPage", recordPage.getNumber());
         model.addAttribute("pageSize", recordPage.getSize());
         model.addAttribute("totalPages", recordPage.getTotalPages());
         model.addAttribute("totalElements", recordPage.getTotalElements());
+        
+        // Add filter values to model for form persistence
+        model.addAttribute("filterEmployeeId", employeeId);
+        model.addAttribute("filterStartDate", startDate);
+        model.addAttribute("filterEndDate", endDate);
     }
 }

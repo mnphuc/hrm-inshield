@@ -5,22 +5,62 @@
         <div class="table-actions">
             <div>
                 <button type="button" class="button" data-open-modal="employeeModal" data-mode="create">
-                    + Thêm nhân viên
+                    ➕ Thêm nhân viên
                 </button>
             </div>
-            <div class="pagination" th:if="${totalPages > 1}">
-                <a class="page-link"
-                   th:classappend="${currentPage == 0}? 'disabled'"
-                   th:href="${currentPage == 0}? '#': @{/cms/employees(page=${currentPage - 1}, size=${pageSize})}">Trang trước</a>
-                <a class="page-link"
-                   th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
-                   th:text="${pageNum + 1}"
-                   th:href="@{/cms/employees(page=${pageNum}, size=${pageSize})}"
-                   th:classappend="${pageNum == currentPage}? 'active'">1</a>
-                <a class="page-link"
-                   th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
-                   th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/employees(page=${currentPage + 1}, size=${pageSize})}">Trang sau</a>
+            <div class="table-summary" th:if="${employees != null and !employees.isEmpty()}">
+                Tổng cộng: <strong th:text="${totalElements}">0</strong> nhân viên
             </div>
+        </div>
+        
+        <!-- Filter form -->
+        <form th:action="@{/cms/employees}" method="get" class="filter-card">
+            <input type="hidden" name="page" value="0">
+            <input type="hidden" name="size" th:value="${pageSize}">
+            <div class="filter-grid">
+                <div class="field">
+                    <label for="filter-name">🔍 Tìm theo tên</label>
+                    <input id="filter-name" type="text" name="name" placeholder="Nhập tên nhân viên" th:value="${filterName}">
+                </div>
+                <div class="field">
+                    <label for="filter-department">🏢 Phòng ban</label>
+                    <select id="filter-department" name="department">
+                        <option value="">Tất cả phòng ban</option>
+                        <option th:each="dept : ${departments}" 
+                                th:value="${dept}" 
+                                th:selected="${filterDepartment != null and filterDepartment.equals(dept)}"
+                                th:text="${dept}"></option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="filter-status">📊 Trạng thái</label>
+                    <select id="filter-status" name="employmentStatus">
+                        <option value="">Tất cả trạng thái</option>
+                        <option th:each="status : ${employmentStatuses}" 
+                                th:value="${status}" 
+                                th:selected="${filterEmploymentStatus != null and filterEmploymentStatus.equals(status)}"
+                                th:text="${status}"></option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="button">🔍 Lọc</button>
+                    <a th:href="@{/cms/employees}" class="button secondary">🔄 Xóa</a>
+                </div>
+            </div>
+        </form>
+        
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a class="page-link"
+               th:classappend="${currentPage == 0}? 'disabled'"
+               th:href="${currentPage == 0}? '#': @{/cms/employees(page=${currentPage - 1}, size=${pageSize}, name=${filterName}, department=${filterDepartment}, employmentStatus=${filterEmploymentStatus})}">Trang trước</a>
+            <a class="page-link"
+               th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+               th:text="${pageNum + 1}"
+               th:href="@{/cms/employees(page=${pageNum}, size=${pageSize}, name=${filterName}, department=${filterDepartment}, employmentStatus=${filterEmploymentStatus})}"
+               th:classappend="${pageNum == currentPage}? 'active'">1</a>
+            <a class="page-link"
+               th:classappend="${currentPage + 1 >= totalPages}? 'disabled'"
+               th:href="${currentPage + 1 >= totalPages}? '#': @{/cms/employees(page=${currentPage + 1}, size=${pageSize}, name=${filterName}, department=${filterDepartment}, employmentStatus=${filterEmploymentStatus})}">Trang sau</a>
         </div>
         <div class="table-wrapper">
             <table class="data-table">
@@ -37,31 +77,30 @@
                 </thead>
                 <tbody>
                 <tr th:each="employee : ${employees}">
-                    <td th:text="${employee.code}">EMP-001</td>
-                    <td th:text="${employee.fullName}">Nguyễn Văn A</td>
-                    <td th:text="${employee.department}">Phòng Kinh doanh</td>
-                    <td th:text="${employee.position}">Nhân viên</td>
-                    <td th:text="${employee.hireDate}">2024-01-01</td>
-                    <td th:text="${employee.employmentStatus}">DANG LAM VIEC</td>
+                    <td th:text="${employee.code != null ? employee.code : '—'}">EMP-001</td>
+                    <td th:text="${employee.fullName != null ? employee.fullName : '—'}">Nguyễn Văn A</td>
+                    <td th:text="${employee.department != null ? employee.department : '—'}">Phòng Kinh doanh</td>
+                    <td th:text="${employee.position != null ? employee.position : '—'}">Nhân viên</td>
+                    <td th:text="${employee.hireDate != null ? employee.hireDate : '—'}">2024-01-01</td>
+                    <td th:text="${employee.employmentStatus != null ? employee.employmentStatus : '—'}">DANG LAM VIEC</td>
                     <td class="actions-cell">
                         <button type="button" class="button-link" data-open-modal="employeeModal" data-mode="edit"
                                 th:attr="data-record-id=${employee.id},
                                          data-update-url=@{/cms/employees/{id}/update(id=${employee.id})},
-                                         data-value-code=${employee.code},
-                                         data-value-full-name=${employee.fullName},
-                                         data-value-email=${employee.email},
-                                         data-value-phone=${employee.phone},
-                                         data-value-department=${employee.department},
-                                         data-value-position=${employee.position},
-                                         data-value-hire-date=${employee.hireDate},
-                                         data-value-termination-date=${employee.terminationDate},
-                                         data-value-employment-status=${employee.employmentStatus},
-                                         data-value-base-salary=${employee.baseSalary},
-                                         data-value-manager-id=${employee.managerId},
-                                         data-value-user-id=${employee.userId}">
+                                         data-value-code=${employee.code != null ? employee.code : ''},
+                                         data-value-full-name=${employee.fullName != null ? employee.fullName : ''},
+                                         data-value-email=${employee.email != null ? employee.email : ''},
+                                         data-value-phone=${employee.phone != null ? employee.phone : ''},
+                                         data-value-department=${employee.department != null ? employee.department : ''},
+                                         data-value-position=${employee.position != null ? employee.position : ''},
+                                         data-value-hire-date=${employee.hireDate != null ? employee.hireDate : ''},
+                                         data-value-termination-date=${employee.terminationDate != null ? employee.terminationDate : ''},
+                                         data-value-employment-status=${employee.employmentStatus != null ? employee.employmentStatus : ''},
+                                         data-value-base-salary=${employee.baseSalary != null ? employee.baseSalary.toString() : ''},
+                                         data-value-manager-id=${employee.managerId != null ? employee.managerId.toString() : ''}">
                             Chỉnh sửa
                         </button>
-                        <form th:action="@{/cms/employees/{id}/delete(id=${employee.id})}" method="post"
+                        <form th:action="@{/cms/employees/{id}/delete(id=${employee.id})}" method="post" class="inline-form"
                               th:attr="data-confirm-message=${'Bạn có chắc muốn xóa ' + employee.fullName + '?'}">
                             <button type="submit" class="link danger">Xóa</button>
                         </form>
@@ -132,11 +171,23 @@
                         <div class="grid two-columns">
                             <div class="field">
                                 <label for="department">Phòng ban</label>
-                                <input id="department" th:field="*{department}" data-field="department" type="text" placeholder="Kinh doanh">
+                                <select id="department" th:field="*{department}" data-field="department">
+                                    <option value="">-- Chọn phòng ban --</option>
+                                    <option th:each="dept : ${departmentOptions}"
+                                            th:value="${dept}"
+                                            th:text="${dept}">Phòng ban</option>
+                                </select>
+                                <small th:if="${#fields.hasErrors('department')}" th:errors="*{department}" class="error-text">Lỗi</small>
                             </div>
                             <div class="field">
                                 <label for="position">Chức vụ</label>
-                                <input id="position" th:field="*{position}" data-field="position" type="text" placeholder="Trưởng nhóm">
+                                <select id="position" th:field="*{position}" data-field="position">
+                                    <option value="">-- Chọn chức vụ --</option>
+                                    <option th:each="pos : ${positionOptions}"
+                                            th:value="${pos}"
+                                            th:text="${pos}">Chức vụ</option>
+                                </select>
+                                <small th:if="${#fields.hasErrors('position')}" th:errors="*{position}" class="error-text">Lỗi</small>
                             </div>
                             <div class="field">
                                 <label for="hireDate">Ngày vào làm</label>
@@ -149,7 +200,13 @@
                             </div>
                             <div class="field">
                                 <label for="employmentStatus">Trạng thái</label>
-                                <input id="employmentStatus" th:field="*{employmentStatus}" data-field="employmentStatus" type="text" placeholder="ĐANG LÀM VIỆC">
+                                <select id="employmentStatus" th:field="*{employmentStatus}" data-field="employmentStatus">
+                                    <option value="">-- Chọn trạng thái --</option>
+                                    <option th:each="status : ${employmentStatusOptions}"
+                                            th:value="${status}"
+                                            th:text="${status}">Trạng thái</option>
+                                </select>
+                                <small th:if="${#fields.hasErrors('employmentStatus')}" th:errors="*{employmentStatus}" class="error-text">Lỗi</small>
                             </div>
                             <div class="field">
                                 <label for="baseSalary">Lương cơ bản</label>
@@ -170,10 +227,6 @@
                                             th:value="${manager.id}"
                                             th:text="${manager.fullName}">Quản lý</option>
                                 </select>
-                            </div>
-                            <div class="field">
-                                <label for="userId">Tài khoản liên kết</label>
-                                <input id="userId" th:field="*{userId}" data-field="userId" type="number" placeholder="ID tài khoản">
                             </div>
                         </div>
                     </div>
@@ -200,6 +253,106 @@
             </form>
         </div>
     </div>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            // Get department-position mapping from server
+            const departmentPositionMap = /*[[${departmentPositionMap}]]*/ {};
+            
+            // Get all position options from server
+            const allPositionOptions = /*[[${positionOptions}]]*/ [];
+            
+            function initializeDepartmentPositionFilter() {
+                const departmentSelect = document.getElementById('department');
+                const positionSelect = document.getElementById('position');
+                
+                if (!departmentSelect || !positionSelect) {
+                    return;
+                }
+                
+                // Function to filter positions based on selected department
+                function filterPositions() {
+                    const selectedDepartment = departmentSelect.value;
+                    const currentValue = positionSelect.value;
+                    
+                    // Clear existing options except the first one
+                    positionSelect.innerHTML = '<option value="">-- Chọn chức vụ --</option>';
+                    
+                    let positionsToShow = [];
+                    
+                    if (selectedDepartment && departmentPositionMap[selectedDepartment]) {
+                        // Show only positions for selected department
+                        positionsToShow = departmentPositionMap[selectedDepartment];
+                    } else {
+                        // If no department selected or department not in map, show all positions
+                        positionsToShow = allPositionOptions;
+                    }
+                    
+                    // Add positions to dropdown
+                    positionsToShow.forEach(pos => {
+                        if (pos) {
+                            const option = document.createElement('option');
+                            option.value = pos;
+                            option.textContent = pos;
+                            positionSelect.appendChild(option);
+                        }
+                    });
+                    
+                    // If current value exists but not in filtered list, add it (for edit mode)
+                    if (currentValue && currentValue !== '' && !positionsToShow.includes(currentValue)) {
+                        const option = document.createElement('option');
+                        option.value = currentValue;
+                        option.textContent = currentValue;
+                        positionSelect.appendChild(option);
+                    }
+                    
+                    // Restore selected value
+                    if (currentValue) {
+                        positionSelect.value = currentValue;
+                    }
+                }
+                
+                // Listen for department changes
+                departmentSelect.addEventListener('change', filterPositions);
+                
+                // Initialize positions when modal opens
+                const modal = document.getElementById('employeeModal');
+                if (modal) {
+                    const observer = new MutationObserver(function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                                if (modal.classList.contains('show')) {
+                                    // Small delay to ensure form fields are populated by app.js
+                                    setTimeout(function() {
+                                        filterPositions();
+                                    }, 150);
+                                }
+                            }
+                        });
+                    });
+                    observer.observe(modal, { attributes: true });
+                    
+                    // Also trigger when modal is opened via button click
+                    document.querySelectorAll('[data-open-modal="employeeModal"]').forEach(button => {
+                        button.addEventListener('click', function() {
+                            setTimeout(function() {
+                                filterPositions();
+                            }, 150);
+                        });
+                    });
+                }
+            }
+            
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeDepartmentPositionFilter);
+            } else {
+                initializeDepartmentPositionFilter();
+            }
+        })();
+        /*]]>*/
+    </script>
 </section>
 </html>
 

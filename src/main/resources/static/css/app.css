@@ -281,6 +281,15 @@ button:hover, .button:hover, .button-link:hover {
 
 .link.danger {
     color: var(--danger);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0;
+    margin: 0;
+    line-height: 1.5;
+    display: inline-block;
 }
 
 .link.danger:hover {
@@ -315,6 +324,26 @@ button:hover, .button:hover, .button-link:hover {
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: flex-start;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.actions-cell button,
+.actions-cell .button-link {
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+.actions-cell .link {
+    margin: 0;
+    padding: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    vertical-align: middle;
 }
 /*.actions-cell {*/
 /*    white-space: nowrap;*/
@@ -878,17 +907,23 @@ button:hover, .button:hover, .button-link:hover {
     border-bottom: none;
 }
 
-/* Price formatting */
-.data-table td:nth-child(7) {
+/* Price formatting - only for equipment table price column */
+.data-table td:nth-child(7):not(.actions-cell) {
     font-weight: 600;
     color: var(--primary);
     font-family: 'Courier New', monospace;
 }
 
-.data-table td:nth-child(7)::before {
+.data-table td:nth-child(7):not(.actions-cell)::before {
     content: "₫";
     margin-right: 4px;
     color: var(--muted);
+}
+
+/* Remove price formatting from actions column */
+.actions-cell::before {
+    content: none !important;
+    margin: 0 !important;
 }
 
 /* Responsive for Equipment Page */
@@ -947,11 +982,17 @@ button:hover, .button:hover, .button-link:hover {
     font-size: 0.95rem;
 }
 
-/* Serial number styling */
-.data-table td:nth-child(4) {
+/* Serial number styling - only for equipment table */
+.equipment-table .data-table td:nth-child(4) {
     font-family: 'Courier New', monospace;
     font-size: 0.85rem;
     color: var(--muted);
+}
+
+/* Position column styling - should not be muted */
+.data-table td:nth-child(4) {
+    color: var(--text);
+    font-size: 0.95rem;
 }
 
 /* Assigned employee styling */
@@ -1320,7 +1361,17 @@ button:hover, .button:hover, .button-link:hover {
 
 .actions-cell .inline-form {
     display: inline-block;
-    margin-left: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+.actions-cell .inline-form button {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    font-size: inherit;
+    line-height: inherit;
 }
 
 /* Card improvements */
