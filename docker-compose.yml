@@ -22,6 +22,8 @@ services:
     depends_on:
       - db
     restart: always
+    networks:
+      - proxy
 
   db:
     image: mariadb
@@ -34,6 +36,11 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     restart: always
+    networks:
+      - proxy
 
 volumes:
   db_data:
+networks:
+  proxy:
+    external: true
