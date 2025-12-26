@@ -15,6 +15,12 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 281003
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hrm-service.rule=Host(`hrm.techshield.cloud`)"
+      - "traefik.http.routers.hrm-service.entrypoints=websecure"
+      - "traefik.http.routers.hrm-service.tls.certresolver=letsencrypt"
+      - "traefik.http.services.hrm-service.loadbalancer.server.port=8080"
     depends_on:
       - db
     restart: always
