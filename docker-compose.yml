@@ -8,8 +8,8 @@ services:
         # Thay đổi BUILD_VERSION để force rebuild khi code thay đổi
         BUILD_VERSION: ${BUILD_VERSION:-1.0.0}
     container_name: insight_web
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/techshield_insight
       SPRING_DATASOURCE_USERNAME: root
